@@ -9,15 +9,13 @@ const glitchedRealmStory: StoryData = {
     start: {
       id: 'start',
       title: 'The Glitch Begins',
-      content: `You're grinding on the rails in your favorite skateboarding game, pulling off a perfect 360 kickflip, when suddenly—*BZZZZT*—your screen flickers. The vibrant colors drain away, replaced by static and glitchy artifacts. Lines of corrupted code scroll across the display in rapid succession: ERROR, WARNING, SYSTEM FAILURE. You reach for your controller, but before you can react, a strange pulling sensation grabs hold of you. The room spins, your vision blurs, and then—whoosh!—you're sucked INTO the game itself.
+      content: `You're grinding on the rails in your favorite skateboarding game, pulling off a perfect 360 kickflip, when suddenly—*BZZZZT*—your screen flickers. Lines of corrupted code scroll across the display: ERROR, WARNING, SYSTEM FAILURE. Before you can react, a strange pulling sensation grabs you. The room spins, your vision blurs, and then—whoosh!—you're sucked INTO the game itself.
 
-You land hard on a pixelated cobblestone street, the impact sending a shockwave through your digital body. Everything feels wrong here. Around you, the world is glitching in impossible ways: medieval castle towers flicker and transform into modern skate park ramps mid-frame. Stone walls become glass buildings, then back to stone again. NPCs—non-player characters—phase in and out of existence like ghosts, their faces distorted, their movements jerky and unnatural. Above you, the sky can't decide what it wants to be, shifting from bright day to star-filled night to sunset orange in mere seconds. It's like someone's messing with reality's settings, and they have no idea what they're doing.
+You land hard on a pixelated street. Everything feels wrong. Around you, the world is glitching: medieval castle towers flicker and transform into modern skate park ramps. Stone walls become glass buildings, then back to stone. NPCs phase in and out of existence like ghosts. Above you, the sky shifts from bright day to star-filled night to sunset orange in seconds.
 
-Your heart races as you try to make sense of it all. This isn't how games are supposed to work. Something is seriously wrong.
+A holographic figure materializes—the game's tutorial character, but twisted and broken. "Warning: Reality.exe has encountered a critical error," it announces before glitching out. "Find the... *bzzt*... Core Blocks... restore system... *bzzt*... before permanent corruption spreads!" The figure vanishes.
 
-A holographic figure materializes in front of you—it looks like the game's tutorial character, that friendly NPC who usually helps new players. But this version is twisted and broken. Its polygonal face glitches between different expressions, and its voice crackles with digital static. "Warning: Reality.exe has encountered a critical error," it announces in a robotic tone before glitching out. "Find the... *bzzt*... Core Blocks... restore system... *bzzt*... before permanent corruption spreads!" The figure flickers one more time and vanishes, leaving you alone in this broken digital world.
-
-You take a deep breath (or what feels like a breath in this virtual body) and look around. Three paths shimmer before you, each one leading to a different corrupted zone:`,
+Three paths shimmer before you, each leading to a different corrupted zone:`,
       choices: [
         {
           id: 'choice-craftmine',
