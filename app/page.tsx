@@ -68,14 +68,15 @@ export default function Home() {
           )}
         </div>
 
-        {/* World Books Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-4xl mx-auto mb-12">
+        {/* World Books Grid - Fixed 2 columns */}
+        <div className="grid grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto mb-12">
           {gameData.worlds.map((world, index) => (
             <motion.div
               key={world.id}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="w-full"
             >
               <WorldBookCard
                 world={world}

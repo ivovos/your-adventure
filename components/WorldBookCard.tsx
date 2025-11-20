@@ -43,23 +43,13 @@ export default function WorldBookCard({ world, onClick }: WorldBookCardProps) {
           <div className="absolute left-2 top-0 bottom-0 w-1 bg-white/20" />
 
           {/* Book Content */}
-          <div className="relative h-full p-8 flex flex-col justify-between">
-            {/* Emoji Icon */}
-            <div className="text-6xl mb-4 filter drop-shadow-lg">
-              {world.emoji}
-            </div>
-
+          <div className="relative h-full p-8 flex flex-col justify-center">
             {/* Title */}
-            <div className="flex-1 flex items-center">
-              <h3 className="text-3xl font-display font-bold text-white leading-tight drop-shadow-lg">
+            <div className="flex-1 flex items-center justify-center">
+              <h3 className="text-3xl font-display font-bold text-gray-900 leading-tight text-center">
                 {world.title}
               </h3>
             </div>
-
-            {/* Description */}
-            <p className="text-sm font-display font-medium text-white/90 drop-shadow-md">
-              {world.description}
-            </p>
 
             {/* Lock Badge */}
             {world.locked && (
