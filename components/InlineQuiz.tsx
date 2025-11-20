@@ -123,15 +123,15 @@ export default function InlineQuiz({
                 onClick={() => handleChoiceClick(choice)}
                 disabled={isCompleted || isLocked}
                 className={`
-                  relative p-6 rounded-2xl border-2 transition-all duration-200
-                  aspect-square flex flex-col items-center justify-center text-center
+                  relative p-4 rounded-xl border-2 transition-all duration-200
+                  flex flex-col items-center justify-center text-center min-h-[100px]
                   ${isSelected
                     ? 'bg-accent/10 border-accent shadow-lg'
                     : 'bg-background border-gray-400 hover:border-gray-600 hover:shadow-md'
                   }
                   ${isCompleted && !isSelected ? 'opacity-40' : ''}
                   ${isLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
-                  ${!isCompleted && !isLocked ? 'active:scale-98' : ''}
+                  ${!isCompleted && !isLocked ? 'active:scale-95' : ''}
                 `}
                 whileHover={!isCompleted && !isLocked ? { y: -4 } : {}}
                 whileTap={!isCompleted && !isLocked ? { scale: 0.98 } : {}}
@@ -144,7 +144,7 @@ export default function InlineQuiz({
                 </div>
 
                 {/* Choice Text */}
-                <p className="font-display font-bold text-xl md:text-2xl leading-tight px-2">
+                <p className="font-display font-bold text-lg leading-snug px-2">
                   {choice.text}
                 </p>
 

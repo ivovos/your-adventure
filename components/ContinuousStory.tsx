@@ -32,15 +32,15 @@ export default function ContinuousStory({
   onDiceResult,
   onItemsGained,
 }: ContinuousStoryProps) {
-  const latestTextRef = useRef<HTMLDivElement>(null);
+  const newTextRef = useRef<HTMLDivElement>(null);
   const prevNodeStackLength = useRef(nodeStack.length);
 
-  // Scroll to latest content when stack grows
+  // Scroll to new content when stack grows
   useEffect(() => {
-    if (nodeStack.length > prevNodeStackLength.current && latestTextRef.current) {
+    if (nodeStack.length > prevNodeStackLength.current && newTextRef.current) {
       // Wait a bit for content to render, then scroll
       setTimeout(() => {
-        latestTextRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        newTextRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 400);
     }
     prevNodeStackLength.current = nodeStack.length;
@@ -98,14 +98,26 @@ export default function ContinuousStory({
         transition={{ duration: 0.5 }}
       >
         {storyParts.map((part, index) => {
-          const isLatestText = index === storyParts.length - 1 && part.type === 'text';
+          // Find the first text node that appears after the last quiz
+          const lastCompletedQuizIndex = storyParts.map((p, i) => ({ ...p, originalIndex: i }))
+            .filter(p => p.type === 'quiz')
+            .reverse()
+            .find((p, i) => {
+              const quizIdx = p.quizIndex;
+              return quizIdx !== undefined && quizAnswers.find(a => a.quizIndex === quizIdx);
+            })?.originalIndex;
+
+          const isNewTextAfterQuiz = part.type === 'text' &&
+            lastCompletedQuizIndex !== undefined &&
+            index > lastCompletedQuizIndex &&
+            storyParts.slice(lastCompletedQuizIndex + 1, index).every(p => p.type !== 'text');
 
           switch (part.type) {
             case 'text':
               return (
                 <motion.div
                   key={`text-${part.node.id}-${index}`}
-                  ref={isLatestText ? latestTextRef : null}
+                  ref={isNewTextAfterQuiz ? newTextRef : null}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.05 }}
