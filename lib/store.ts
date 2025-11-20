@@ -1,0 +1,93 @@
+import { create } from 'zustand';
+import { PlayerState, QuizAnswer } from '@/types/story';
+
+interface StoryStore extends PlayerState {
+  currentWorldId: string;
+  nodeStack: string[]; // Stack of node IDs in the order they were visited
+  setCurrentWorld: (worldId: string) => void;
+  setCurrentNode: (nodeId: string) => void;
+  addNodeToStack: (nodeId: string) => void;
+  addToInventory: (item: string) => void;
+  addVisitedNode: (nodeId: string) => void;
+  addAnsweredQuestion: (questionId: string) => void;
+  addQuizAnswer: (quizAnswer: QuizAnswer) => void;
+  resetProgress: () => void;
+  loadProgress: (state: PlayerState & { currentWorldId?: string; nodeStack?: string[] }) => void;
+}
+
+const initialState: PlayerState & { currentWorldId: string; nodeStack: string[] } = {
+  currentWorldId: 'glitched-realm',
+  currentNodeId: 'start',
+  nodeStack: ['start'],
+  inventory: [],
+  visitedNodes: [],
+  answeredQuestions: [],
+  quizAnswers: [],
+  lastUpdated: Date.now(),
+};
+
+export const useStoryStore = create<StoryStore>((set) => ({
+  ...initialState,
+
+  setCurrentWorld: (worldId: string) =>
+    set({
+      currentWorldId: worldId,
+      currentNodeId: 'start',
+      nodeStack: ['start'],
+      inventory: [],
+      visitedNodes: [],
+      answeredQuestions: [],
+      lastUpdated: Date.now(),
+    }),
+
+  setCurrentNode: (nodeId: string) =>
+    set((state) => ({
+      currentNodeId: nodeId,
+      visitedNodes: [...state.visitedNodes, nodeId],
+      lastUpdated: Date.now(),
+    })),
+
+  addNodeToStack: (nodeId: string) =>
+    set((state) => ({
+      currentNodeId: nodeId,
+      nodeStack: [...state.nodeStack, nodeId],
+      visitedNodes: [...state.visitedNodes, nodeId],
+      lastUpdated: Date.now(),
+    })),
+
+  addToInventory: (item: string) =>
+    set((state) => ({
+      inventory: [...state.inventory, item],
+      lastUpdated: Date.now(),
+    })),
+
+  addVisitedNode: (nodeId: string) =>
+    set((state) => ({
+      visitedNodes: state.visitedNodes.includes(nodeId)
+        ? state.visitedNodes
+        : [...state.visitedNodes, nodeId],
+      lastUpdated: Date.now(),
+    })),
+
+  addAnsweredQuestion: (questionId: string) =>
+    set((state) => ({
+      answeredQuestions: [...state.answeredQuestions, questionId],
+      lastUpdated: Date.now(),
+    })),
+
+  addQuizAnswer: (quizAnswer: QuizAnswer) =>
+    set((state) => ({
+      quizAnswers: [...state.quizAnswers, quizAnswer],
+      lastUpdated: Date.now(),
+    })),
+
+  resetProgress: () => set(initialState),
+
+  loadProgress: (state: PlayerState & { currentWorldId?: string; nodeStack?: string[] }) =>
+    set({
+      ...state,
+      currentWorldId: state.currentWorldId || 'glitched-realm',
+      nodeStack: state.nodeStack || ['start'],
+      quizAnswers: state.quizAnswers || [],
+    }),
+}));

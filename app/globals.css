@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-text-primary: #000000;
+  --color-text-secondary: #666666;
+  --color-background: #FFFFFF;
+  --color-background-subtle: #F7F7F7;
+  --color-accent: #00D632;
+  --color-accent-hover: #00BD2A;
+  --max-width-reading: 680px;
+  --spacing-reading: 2rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-background text-text-primary font-serif antialiased;
+    font-size: 19px;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl mb-6;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl mb-4;
+  }
+
+  h3 {
+    @apply text-3xl md:text-4xl mb-3;
+  }
+
+  button {
+    @apply font-display font-semibold;
+  }
+}
+
+@layer components {
+  .reading-container {
+    @apply max-w-reading mx-auto px-6 md:px-8;
+  }
+
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-hover active:bg-accent-dark text-black font-display font-bold px-8 py-4 rounded-2xl transition-all duration-150 min-h-[56px] text-lg shadow-sm hover:shadow-md active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply bg-background-subtle hover:bg-gray-200 active:bg-gray-300 text-text-primary font-display font-bold px-8 py-4 rounded-2xl transition-all duration-150 min-h-[56px] text-lg border-2 border-gray-200 active:scale-95;
+  }
+
+  .choice-button {
+    @apply w-full text-left bg-background hover:bg-background-subtle text-text-primary font-display font-semibold px-6 py-5 rounded-2xl transition-all duration-150 border-2 border-gray-200 hover:border-accent active:scale-95 min-h-[60px] text-lg;
+  }
+
+  .story-content {
+    @apply text-lg md:text-xl leading-relaxed mb-8;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
