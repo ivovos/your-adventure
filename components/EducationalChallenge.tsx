@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { EducationalChallenge as ChallengeType } from '@/types/story';
 
 interface EducationalChallengeProps {
@@ -24,16 +24,21 @@ export default function EducationalChallenge({
     const correct = selectedAnswer === challenge.correctAnswer;
     setIsCorrect(correct);
     setShowExplanation(true);
+  };
 
-    if (correct) {
-      setTimeout(() => {
-        onCorrect();
-      }, 2000);
+  const handleContinue = () => {
+    if (isCorrect) {
+      onCorrect();
+    } else {
+      // Reset for retry
+      setShowExplanation(false);
+      setIsCorrect(null);
+      setSelectedAnswer(null);
     }
   };
 
   return (
-    <div className="my-8 p-6 md:p-8 bg-accent/5 rounded-3xl border-2 border-accent">
+    <div className="my-8 p-6 md:p-8 bg-accent/5 rounded-3xl border-2 border-accent relative">
       {/* Challenge Header */}
       <div className="mb-6">
         <div className="inline-block px-4 py-2 bg-accent text-black text-sm font-display font-bold rounded-full mb-4">
@@ -54,26 +59,15 @@ export default function EducationalChallenge({
               key={index}
               onClick={() => !showExplanation && setSelectedAnswer(option)}
               disabled={showExplanation}
-              className={`w-full text-left px-6 py-4 rounded-2xl font-display font-semibold text-base md:text-lg transition-all border-2 ${
-                selectedAnswer === option
+              className={`w-full text-left px-6 py-4 rounded-2xl font-display font-semibold text-base md:text-lg transition-all border-2 ${selectedAnswer === option
                   ? 'bg-accent text-black border-accent scale-98'
                   : 'bg-white border-gray-200 hover:border-accent hover:bg-background-subtle'
-              } ${showExplanation ? 'cursor-not-allowed' : ''} ${
-                showExplanation && option === challenge.correctAnswer
-                  ? 'bg-accent text-black border-accent'
-                  : ''
-              } ${
-                showExplanation &&
-                selectedAnswer === option &&
-                option !== challenge.correctAnswer
-                  ? 'bg-red-50 border-red-400 text-red-900'
-                  : ''
-              }`}
+                } ${showExplanation ? 'cursor-not-allowed opacity-50' : ''}`}
             >
               <span className="flex items-center justify-between">
                 <span>{option}</span>
-                {showExplanation && option === challenge.correctAnswer && (
-                  <span className="text-2xl">✓</span>
+                {selectedAnswer === option && (
+                  <span className="text-xl">●</span>
                 )}
               </span>
             </button>
@@ -116,48 +110,51 @@ export default function EducationalChallenge({
         </button>
       )}
 
-      {/* Result & Explanation */}
-      {showExplanation && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`mt-6 p-6 rounded-3xl ${
-            isCorrect
-              ? 'bg-accent text-black border-2 border-accent'
-              : 'bg-red-50 border-2 border-red-400'
-          }`}
-        >
-          <p
-            className={`text-2xl md:text-3xl font-display font-bold mb-3 ${
-              isCorrect ? 'text-black' : 'text-red-700'
-            }`}
+      {/* Full Screen Feedback Overlay */}
+      <AnimatePresence>
+        {showExplanation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={`fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 ${isCorrect ? 'bg-green-500' : 'bg-red-500'
+              }`}
           >
-            {isCorrect ? '✓ Nailed it!' : '✗ Not quite'}
-          </p>
-          {challenge.explanation && (
-            <p className="text-base md:text-lg font-display font-medium mb-3">
-              {challenge.explanation}
-            </p>
-          )}
-          {isCorrect && (
-            <p className="text-sm font-display font-medium opacity-75 mt-3">
-              Moving to the next part...
-            </p>
-          )}
-          {!isCorrect && (
-            <button
-              onClick={() => {
-                setShowExplanation(false);
-                setIsCorrect(null);
-                setSelectedAnswer(null);
-              }}
-              className="btn-secondary mt-4"
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center shadow-2xl"
             >
-              Try Again
-            </button>
-          )}
-        </motion.div>
-      )}
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${isCorrect ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                }`}>
+                <span className="text-4xl">{isCorrect ? '✓' : '✗'}</span>
+              </div>
+
+              <h2 className={`text-3xl md:text-4xl font-display font-bold mb-4 ${isCorrect ? 'text-green-600' : 'text-red-600'
+                }`}>
+                {isCorrect ? 'Correct!' : 'Incorrect'}
+              </h2>
+
+              {challenge.explanation && (
+                <p className="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed">
+                  {challenge.explanation}
+                </p>
+              )}
+
+              <button
+                onClick={handleContinue}
+                className={`w-full py-4 rounded-xl font-display font-bold text-lg text-white transition-transform active:scale-95 ${isCorrect
+                    ? 'bg-green-600 hover:bg-green-700 shadow-lg shadow-green-200'
+                    : 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-200'
+                  }`}
+              >
+                {isCorrect ? 'Continue' : 'Try Again'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

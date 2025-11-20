@@ -3,14 +3,31 @@
 @tailwind utilities;
 
 :root {
+  /* Colors */
   --color-text-primary: #000000;
   --color-text-secondary: #666666;
   --color-background: #FFFFFF;
   --color-background-subtle: #F7F7F7;
   --color-accent: #00D632;
   --color-accent-hover: #00BD2A;
+  --color-accent-dark: #00A023;
+  --color-purple: #A259FF;
+  --color-blue: #00D5FF;
+  --color-yellow: #FFCF00;
+
+  /* Fonts */
+  --font-serif: 'Charter', 'Iowan Old Style', 'Georgia', 'serif';
+  --font-sans: '-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Inter', 'sans-serif';
+  --font-display: '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif';
+
+  /* Layout */
   --max-width-reading: 680px;
   --spacing-reading: 2rem;
+  
+  /* Border Radius */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
 }
 
 @layer base {

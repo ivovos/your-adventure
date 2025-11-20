@@ -21,6 +21,8 @@ interface ContinuousStoryProps {
   onChoiceComplete: (quizIndex: number, choiceId: string, nextNodeId: string) => void;
   onDiceResult: (success: boolean, nextNodeId: string) => void;
   onItemsGained: (items: string[]) => void;
+  title: string;
+  emoji: string;
 }
 
 export default function ContinuousStory({
@@ -31,6 +33,8 @@ export default function ContinuousStory({
   onChoiceComplete,
   onDiceResult,
   onItemsGained,
+  title,
+  emoji,
 }: ContinuousStoryProps) {
   const newTextRef = useRef<HTMLDivElement>(null);
   const prevNodeStackLength = useRef(nodeStack.length);
@@ -97,6 +101,18 @@ export default function ContinuousStory({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
+        {/* Title Page */}
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center mb-24 border-b-2 border-gray-100 pb-12">
+          <div className="text-8xl mb-8">{emoji}</div>
+          <h1 className="text-5xl md:text-7xl font-serif font-bold text-balance mb-6 text-text-primary">
+            {title}
+          </h1>
+          <div className="w-24 h-1 bg-accent rounded-full mb-8"></div>
+          <p className="text-text-secondary font-display font-medium uppercase tracking-widest text-sm">
+            A Choose Your Own Adventure
+          </p>
+        </div>
+
         {storyParts.map((part, index) => {
           // Find the first text node that appears after the last quiz
           const lastCompletedQuizIndex = storyParts.map((p, i) => ({ ...p, originalIndex: i }))

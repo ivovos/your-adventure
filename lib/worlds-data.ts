@@ -9,13 +9,9 @@ const glitchedRealmStory: StoryData = {
     start: {
       id: 'start',
       title: 'The Glitch Begins',
-      content: `You're grinding on the rails in your favorite skateboarding game, pulling off a perfect 360 kickflip, when suddenly—*BZZZZT*—your screen flickers. Lines of corrupted code scroll across the display: ERROR, WARNING, SYSTEM FAILURE. Before you can react, a strange pulling sensation grabs you. The room spins, your vision blurs, and then—whoosh!—you're sucked INTO the game itself.
+      content: `You're grinding on the rails in your favorite skateboarding game when—*BZZZZT*—your screen flickers. Lines of corrupted code scroll across the display: ERROR, WARNING, SYSTEM FAILURE. Before you can react, a strange pulling sensation grabs you, and you're sucked INTO the game itself.
 
-You land hard on a pixelated street. Everything feels wrong. Around you, the world is glitching: medieval castle towers flicker and transform into modern skate park ramps. Stone walls become glass buildings, then back to stone. NPCs phase in and out of existence like ghosts. Above you, the sky shifts from bright day to star-filled night to sunset orange in seconds.
-
-A holographic figure materializes—the game's tutorial character, but twisted and broken. "Warning: Reality.exe has encountered a critical error," it announces before glitching out. "Find the... *bzzt*... Core Blocks... restore system... *bzzt*... before permanent corruption spreads!" The figure vanishes.
-
-Three paths shimmer before you, each leading to a different corrupted zone:`,
+A holographic figure materializes—the game's tutorial character, but twisted and broken. "Warning: Reality.exe has encountered a critical error," it announces. "Find the... *bzzt*... Core Blocks... restore system... *bzzt*... before permanent corruption spreads!"`,
       choices: [
         {
           id: 'choice-craftmine',
@@ -54,15 +50,9 @@ Three paths shimmer before you, each leading to a different corrupted zone:`,
     'craftmine-entrance': {
       id: 'craftmine-entrance',
       title: 'The Craft-Mine District',
-      content: `The Craft-Mine District is chaos incarnate—pure, unfiltered digital madness. As you step into the zone, reality itself seems to break apart. Half-rendered chunks of terrain float impossibly in mid-air, defying all laws of physics. Some chunks are upside-down, others rotate slowly like they're stuck in an infinite loading screen. Below you, the ground flickers between grass, stone, and pure void. Hostile mobs spawn and despawn randomly around you—zombies appear for a split second before vanishing into pixels, skeletons fire arrows that freeze mid-air, and creepers phase in and out of existence without ever exploding.
+      content: `The Craft-Mine District is chaos incarnate. Half-rendered chunks of terrain float impossibly in mid-air, and the ground flickers between grass, stone, and pure void.
 
-The whole district pulses with unstable energy. Blocks flicker between different types: dirt becomes diamond, then sandstone, then back to dirt again. It's dizzying to watch. The air itself crackles with corrupt data, visible as glitchy particles floating all around you.
-
-In the center of this chaos, you spot a crafting table—the iconic 3x3 grid that every player knows. But this one is glitching wildly between different states: wooden table, stone table, iron table, back to wood. On its surface, a holographic message flickers in and out of existence: "REDSTONE PUZZLE CORRUPTED. Solve to access the... *bzzt*... Core Block."
-
-A villager suddenly phases into existence nearby, appearing out of thin air with a digital *pop*. His character model is broken—one arm is missing, his face glitches between different textures, and his name tag floats crookedly above his head: "Error_Trader_404". When he speaks, his voice is fragmented, like a corrupted audio file: "Young... *glitch*... one. The Core Block CONCEALS itself deep within the Nether Portal. But portal needs... *bzzt*... four Glitch Shards to activate. I can trade you one shard... if you can solve my riddle."
-
-He gestures toward a row of wooden signs, each one displaying a different word. The signs flicker and buzz with electric energy.`,
+A villager phases into existence, his name tag reading "Error_Trader_404". "The Core Block CONCEALS itself deep within the Nether Portal," he glitches. "It's hidden well. I can trade you a shard if you can solve my riddle."`,
       choices: [
         {
           id: 'choice-trade',
@@ -88,9 +78,9 @@ He gestures toward a row of wooden signs, each one displaying a different word. 
     'trader-riddle': {
       id: 'trader-riddle',
       title: 'The Trader\'s Challenge',
-      content: `Error_Trader_404 grins (or glitches into something resembling a grin). "Smart choice. Here's your challenge: I need to write a sign, but the glitch has scrambled the letters. Which word is spelled INCORRECTLY?"
+      content: `Error_Trader_404 grins. "Smart choice. I need to write a sign, but the glitch has scrambled the letters. I need to write 'DEFINITELY', but I keep getting it wrong.
 
-Four signs appear, each with a word written on it. One of them flickers more than the others.`,
+Which of these signs is spelled INCORRECTLY?"`,
       choices: [
         {
           id: 'word-1',
@@ -125,11 +115,9 @@ Four signs appear, each with a word written on it. One of them flickers more tha
     'trader-success': {
       id: 'trader-success',
       title: 'First Glitch Shard Obtained',
-      content: `"Impressive!" Error_Trader_404 flickers happily and hands you a glowing blue shard that pulses with corrupted energy. The Glitch Shard feels warm in your hand, and lines of code swirl inside it.
+      content: `"Impressive!" Error_Trader_404 hands you a glowing blue Glitch Shard. "You'll need three more shards," he says. "Try the Redstone Factory—it's ADJACENT to here. That means it's right next to us!"
 
-"You'll need three more shards," he says. "Try the Redstone Factory—it's ADJACENT to here. But be careful, the glitch has made everything... unpredictable."
-
-As he speaks, the ground trembles. A chunk of the world reloads nearby with a sound like thousands of blocks being placed at once.`,
+As he speaks, the ground trembles, revealing a path to the nearby factory.`,
       itemsGained: ['Glitch Shard #1'],
       choices: [
         {
@@ -156,11 +144,9 @@ As he speaks, the ground trembles. A chunk of the world reloads nearby with a so
     'corrupted-mines': {
       id: 'corrupted-mines',
       title: 'The Corrupted Mines',
-      content: `You descend into the mines, but something is very wrong. The minecart tracks twist in impossible directions, defying gravity. Ores spawn and despawn, and you hear the sound of pickaxes that aren't there.
+      content: `You descend into the mines. At the bottom, you find an ancient chest flickering between locked and unlocked states.
 
-At the bottom, you find an ancient chest flickering between locked and unlocked states. When it stabilizes for a moment, you see it contains a Glitch Shard!
-
-But there's a riddle carved into the wall beside it, glitching between different languages. Finally it settles on English: "To OBTAIN what lies within, prove your knowledge of the written word."`,
+A riddle is carved into the wall: "To OBTAIN what lies within, you must acquire the key."`,
       choices: [
         {
           id: 'chest-puzzle',
@@ -181,9 +167,9 @@ But there's a riddle carved into the wall beside it, glitching between different
     'chest-solution': {
       id: 'chest-solution',
       title: 'Spelling Lock',
-      content: `The chest lid displays a holographic keyboard. A message appears: "SPELL THE WORD TO UNLOCK. Which spelling is CORRECT?"
+      content: `The chest lid displays a holographic keyboard. A message appears: "SPELL THE WORD TO UNLOCK. Remember, there is 'A RAT' in SEPARATE."
 
-The word you need to spell is crucial—it's the nature of the glitch itself.`,
+Which spelling is CORRECT?`,
       choices: [
         {
           id: 'spell-1',
@@ -219,13 +205,9 @@ The word you need to spell is crucial—it's the nature of the glitch itself.`,
     'chest-opened': {
       id: 'chest-opened',
       title: 'Second Shard Found',
-      content: `The chest clicks open with a satisfying sound effect (the same one from treasure chests in adventure games). Inside, glowing with purple energy, is another Glitch Shard!
+      content: `The chest clicks open. Inside is another Glitch Shard!
 
-As you pick it up, the mines around you stabilize slightly. The flickering slows. You're making progress.
-
-Your inventory now shows: Two Glitch Shards. Two more to go.
-
-You hear music drifting down from above—electronic beats mixed with the sound of wheels on pavement. The Skate District?`,
+Your inventory now shows: Two Glitch Shards. You hear music drifting down from above—electronic beats mixed with the sound of wheels on pavement. The Skate District?`,
       itemsGained: ['Glitch Shard #2'],
       choices: [
         {
@@ -244,11 +226,7 @@ You hear music drifting down from above—electronic beats mixed with the sound 
     'skate-entrance': {
       id: 'skate-entrance',
       title: 'Neon Skate District',
-      content: `You emerge into a glitching paradise of concrete and neon. Half-pipes flicker between different sizes, rails extend and retract, and grind spots appear and disappear.
-
-Glitched skaters zoom past—some sideways, some upside-down, one riding backwards through the air. The laws of physics are merely suggestions here.
-
-A holographic skate coach appears, his pixel art body glitching between a medieval knight and a modern skater. "Yo! Welcome to the sickest—*bzzt*—district in the realm. I've got a Glitch Shard, but you'll have to DEMONSTRATE your skills first."
+      content: `You emerge into a glitching paradise of concrete and neon. A holographic skate coach appears. "Yo! I've got a Glitch Shard, but you'll have to DEMONSTRATE your skills first. Show me what you got!"
 
 A spelling challenge appears on a massive LED screen above a half-pipe.`,
       choices: [
@@ -276,11 +254,9 @@ A spelling challenge appears on a massive LED screen above a half-pipe.`,
     'skate-puzzle': {
       id: 'skate-puzzle',
       title: 'Spell & Shred',
-      content: `"Alright! Here's the deal," says the coach. "You're gonna spell while you skate. The glitch has corrupted our trick list—one of these words is spelled wrong. Find it while you land a kickflip!"
+      content: `"Alright! Here's the deal," says the coach. "You're gonna spell while you skate. Remember the rule: 'I before E except after C', so BELIEVE follows the rule."
 
-You drop into the half-pipe. As you ride, four words flash on the LED screen. Your skater avatar does tricks in rhythm with your choices.
-
-Which word is spelled INCORRECTLY?`,
+Which word below is spelled INCORRECTLY?`,
       choices: [
         {
           id: 'trick-1',
@@ -315,11 +291,9 @@ Which word is spelled INCORRECTLY?`,
     'skate-success': {
       id: 'skate-success',
       title: 'Radical Reward',
-      content: `"SICK!" The coach flickers excitedly as you land your final trick. "That was totally radical! You've earned this."
+      content: `"SICK!" The coach flickers excitedly. "That was totally radical! You've earned this."
 
-He tosses you a Glitch Shard that glows with neon blue and pink energy. As you catch it, the skate park stabilizes—the ramps stop flickering, and the rails become solid.
-
-"One more shard to go," he says. "But listen—the final one? That's in the Boss Tower. You'll need to face the Glitch Guardian. It's a tough challenge, but I believe in you. Make sure you're ready before you go there."
+He tosses you a Glitch Shard. "One more shard to go," he says. "The final one is in the Boss Tower. Make sure you're ready."
 
 Your inventory: Three Glitch Shards.`,
       itemsGained: ['Glitch Shard #3'],
@@ -340,11 +314,7 @@ Your inventory: Three Glitch Shards.`,
     'skate-rails': {
       id: 'skate-rails',
       title: 'Hidden Rails',
-      content: `You explore the edges of the district and find a hidden area where rails phase between different games—Tony Hawk, Skate, even some futuristic hover-rails.
-
-A glitched treasure chest sits at the end of a particularly tricky rail combo. But there's no shard here—just some useful items and a hint about the final boss.
-
-A message etched in the concrete reads: "The Guardian fears ANCIENT wisdom more than modern force."`,
+      content: `You explore the edges of the district and find a hidden area. A message etched in the concrete reads: "The Guardian fears ANCIENT wisdom more than modern force."`,
       choices: [
         {
           id: 'back-challenge',
@@ -362,11 +332,7 @@ A message etched in the concrete reads: "The Guardian fears ANCIENT wisdom more 
     'redstone-factory': {
       id: 'redstone-factory',
       title: 'The Redstone Factory',
-      content: `The Redstone Factory is a massive structure that looks like it was built by an engineer on a creative mode binge. Redstone circuits sprawl across walls and floors, pistons fire randomly, and hoppers suck items into unknown destinations.
-
-At the center of the main room, a complex puzzle glows: seven levers, each labeled with a word. Only one combination will unlock the factory's core where a Glitch Shard waits.
-
-A sign flickers into readability: "PULL THE LEVER WITH THE WORD THAT MEANS 'LASTING FOREVER' TO ACCESS THE CORE."
+      content: `The Redstone Factory is a massive structure of circuits and pistons. A sign flickers: "PULL THE LEVER WITH THE WORD THAT MEANS 'LASTING FOREVER' TO ACCESS THE CORE."
 
 What does PERMANENT mean?`,
       choices: [
@@ -389,13 +355,9 @@ What does PERMANENT mean?`,
     'factory-puzzle': {
       id: 'factory-puzzle',
       title: 'Core Access',
-      content: `You pull the correct lever. The factory roars to life—but in a good way. Pistons align, hoppers organize themselves, and the redstone circuits pulse in a beautiful, synchronized pattern.
+      content: `You pull the correct lever. A hidden door opens, revealing the factory core and another Glitch Shard!
 
-A hidden door opens, revealing the factory core. Inside, on a pedestal surrounded by perfectly timed redstone torches, sits another Glitch Shard!
-
-But as you reach for it, an alarm sounds. The glitch knows you're close to fixing it. The corruption seems almost... RELUCTANT to be solved.
-
-"WARNING: SYSTEM REPAIR IN PROGRESS. BOSS ENCOUNTER IMMINENT."`,
+But as you reach for it, an alarm sounds. The glitch is RELUCTANT to be solved—it is unwilling to let you win.`,
       choices: [
         {
           id: 'grab-shard',
@@ -416,13 +378,11 @@ But as you reach for it, an alarm sounds. The glitch knows you're close to fixin
     'factory-shard': {
       id: 'factory-shard',
       title: 'The Fourth Shard',
-      content: `You grab the Glitch Shard. Power surges through you as all four shards in your inventory begin to resonate with each other. They're reacting, pulling toward something...
+      content: `You grab the Glitch Shard. Power surges through you as all four shards in your inventory begin to resonate.
 
-The Boss Tower. You can see it in the distance now, materializing as if the shards are revealing it. It's a fusion of all the districts: blocky base, neon lights spiraling up its sides, rails wrapping around it, and at its peak, ancient temple architecture.
+"FOUR GLITCH SHARDS COLLECTED. BOSS TOWER ACCESSIBLE."
 
-"FOUR GLITCH SHARDS COLLECTED. BOSS TOWER ACCESSIBLE. PREPARE FOR FINAL CONFRONTATION."
-
-Your skateboard appears beneath your feet, glowing with shard energy. Time to finish this.`,
+Your skateboard appears beneath your feet. Time to finish this.`,
       itemsGained: ['Glitch Shard #4'],
       choices: [
         {
@@ -436,15 +396,11 @@ Your skateboard appears beneath your feet, glowing with shard energy. Time to fi
     'boss-tower': {
       id: 'boss-tower',
       title: 'The Boss Tower',
-      content: `The tower's entrance looms before you. Inside, you can see a spiral of challenges—each district's theme represented. But you have all four shards now. You're ready.
+      content: `The tower's entrance looms before you. As you enter, the Glitch Guardian materializes.
 
-As you enter, the Glitch Guardian materializes. It's massive—a corrupted fusion of a blocky golem, a skateboarding athlete, and an ancient knight. Its body flickers between forms, and its eyes glow with unstable code.
+"YOU... *glitch*... SEEK TO... *bzzt*... RESTORE?"
 
-"YOU... *glitch*... SEEK TO... *bzzt*... RESTORE? I AM THE GLITCH. I AM... *static*... INEVITABLE."
-
-But you notice something. The Guardian looks... tired. Maybe it WANTS to be fixed?
-
-You need to place the four shards in their slots around the room. But first, one final challenge appears on the tower's central screen.`,
+You need to place the four shards in their slots around the room. But first, one final challenge appears.`,
       choices: [
         {
           id: 'boss-challenge',
@@ -457,9 +413,9 @@ You need to place the four shards in their slots around the room. But first, one
     'boss-final': {
       id: 'boss-final',
       title: 'The Final Test',
-      content: `The Guardian speaks, its voice stabilizing: "To restore... the realm... prove your mastery... of words. Which word below is spelled INCORRECTLY? Choose wisely... this determines... everything."
+      content: `The Guardian speaks: "To restore the realm, prove your mastery of words. SUFFICIENT is spelled with an I before the ENT.
 
-Four words appear in glowing letters around the room. The Guardian watches. Your four shards pulse with energy, ready to be placed if you succeed.`,
+Which word below is spelled INCORRECTLY?"`,
       choices: [
         {
           id: 'final-1',
@@ -494,15 +450,11 @@ Four words appear in glowing letters around the room. The Guardian watches. Your
     'victory-roll': {
       id: 'victory-roll',
       title: 'The Restoration Dice',
-      content: `The Guardian nods slowly. "Correct. You have... proven yourself... worthy."
+      content: `The Guardian nods. "Correct. You have proven yourself worthy."
 
-The four shard slots light up. You place each shard carefully. As the final shard clicks into place, the Guardian speaks one more time:
+The four shard slots light up. You place each shard carefully.
 
-"But... there is one... final element. Chaos and order... must be... balanced. Roll the dice... of fate. Roll 10 or higher... and the realm... stabilizes. Roll lower... and chaos... remains... manageable... but unpredictable."
-
-A massive twenty-sided die materializes in your hand, glowing with all the colors of the districts.
-
-This is it. Time to roll.`,
+"But there is one final element. Chaos and order must be balanced. Roll the dice of fate. Roll 10 or higher and the realm stabilizes."`,
       diceRoll: {
         description: 'Roll to restore the realm!',
         diceType: 20,

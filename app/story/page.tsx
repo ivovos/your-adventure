@@ -17,11 +17,14 @@ export default function Story() {
   const addToInventory = useStoryStore((state) => state.addToInventory);
   const addQuizAnswer = useStoryStore((state) => state.addQuizAnswer);
 
+  const generatedWorlds = useStoryStore((state) => state.generatedWorlds);
+
   // Auto-save progress
   useSaveProgress();
 
   // Get current world
-  const currentWorld = gameData.worlds.find((w) => w.id === currentWorldId);
+  const currentWorld = gameData.worlds.find((w) => w.id === currentWorldId) ||
+    generatedWorlds.find((w) => w.id === currentWorldId);
   const storyData = currentWorld?.storyData;
 
   useEffect(() => {
@@ -76,6 +79,8 @@ export default function Story() {
         onChoiceComplete={handleChoiceComplete}
         onDiceResult={handleDiceResult}
         onItemsGained={handleItemsGained}
+        title={storyData.title}
+        emoji={currentWorld.emoji}
       />
 
       {/* Inventory Display - Fixed at bottom */}

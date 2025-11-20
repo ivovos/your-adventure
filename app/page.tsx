@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { hasSavedProgress, loadSavedProgress, clearSavedProgress } from '@/lib/hooks';
@@ -55,17 +56,30 @@ export default function Home() {
             Choose your world and start learning
           </p>
 
-          {/* Continue Button */}
-          {canContinue && (
-            <motion.button
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              onClick={handleContinue}
-              className="btn-primary mb-8"
-            >
-              📖 Continue Your Story
-            </motion.button>
-          )}
+          {/* Action Buttons */}
+          <div className="flex flex-col items-center gap-4 mb-12">
+            {canContinue && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                onClick={handleContinue}
+                className="btn-primary w-full max-w-md"
+              >
+                📖 Continue Your Story
+              </motion.button>
+            )}
+
+            <Link href="/create" className="w-full max-w-md">
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="btn-secondary w-full border-accent border-2 text-black hover:bg-accent/5"
+              >
+                ✨ Create Your Own Story
+              </motion.button>
+            </Link>
+          </div>
         </div>
 
         {/* World Books Grid - Fixed 2 columns */}

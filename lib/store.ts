@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { PlayerState, QuizAnswer } from '@/types/story';
+import { PlayerState, QuizAnswer, World } from '@/types/story';
 
 interface StoryStore extends PlayerState {
   currentWorldId: string;
@@ -13,9 +13,11 @@ interface StoryStore extends PlayerState {
   addQuizAnswer: (quizAnswer: QuizAnswer) => void;
   resetProgress: () => void;
   loadProgress: (state: PlayerState & { currentWorldId?: string; nodeStack?: string[] }) => void;
+  generatedWorlds: World[];
+  addGeneratedWorld: (world: World) => void;
 }
 
-const initialState: PlayerState & { currentWorldId: string; nodeStack: string[] } = {
+const initialState: PlayerState & { currentWorldId: string; nodeStack: string[]; generatedWorlds: World[] } = {
   currentWorldId: 'glitched-realm',
   currentNodeId: 'start',
   nodeStack: ['start'],
@@ -24,6 +26,7 @@ const initialState: PlayerState & { currentWorldId: string; nodeStack: string[] 
   answeredQuestions: [],
   quizAnswers: [],
   lastUpdated: Date.now(),
+  generatedWorlds: [],
 };
 
 export const useStoryStore = create<StoryStore>((set) => ({
@@ -39,6 +42,11 @@ export const useStoryStore = create<StoryStore>((set) => ({
       answeredQuestions: [],
       lastUpdated: Date.now(),
     }),
+
+  addGeneratedWorld: (world: World) =>
+    set((state) => ({
+      generatedWorlds: [...state.generatedWorlds, world],
+    })),
 
   setCurrentNode: (nodeId: string) =>
     set((state) => ({
@@ -83,11 +91,12 @@ export const useStoryStore = create<StoryStore>((set) => ({
 
   resetProgress: () => set(initialState),
 
-  loadProgress: (state: PlayerState & { currentWorldId?: string; nodeStack?: string[] }) =>
+  loadProgress: (state: PlayerState & { currentWorldId?: string; nodeStack?: string[]; generatedWorlds?: World[] }) =>
     set({
       ...state,
       currentWorldId: state.currentWorldId || 'glitched-realm',
       nodeStack: state.nodeStack || ['start'],
       quizAnswers: state.quizAnswers || [],
+      generatedWorlds: state.generatedWorlds || [],
     }),
 }));

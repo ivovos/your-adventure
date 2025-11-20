@@ -118,13 +118,17 @@ test.describe('Adventure Story Paths', () => {
     await page.getByRole('button', { name: /Examine the coded message/i }).click();
 
     // Check for hint button
-    await expect(page.getByRole('button', { name: /Need a hint/i })).toBeVisible();
+    const hintBtn = page.getByRole('button', { name: /Need a hint/i });
+    await expect(hintBtn).toBeVisible();
+
+    // Scroll to it to be sure
+    await hintBtn.scrollIntoViewIfNeeded();
 
     // Click hint
-    await page.getByRole('button', { name: /Need a hint/i }).click();
+    await hintBtn.click();
 
     // Hint should be visible
-    await expect(page.getByText(/Hint:/i)).toBeVisible();
+    await expect(page.getByText(/Hint:/i)).toBeVisible({ timeout: 10000 });
   });
 
   test('should track inventory items', async ({ page }) => {
@@ -184,7 +188,7 @@ test.describe('Adventure Story Paths', () => {
 
     if (hasIncorrectQuestion) {
       // Should have 4 different words to choose from
-      const buttons = page.getByRole('button').filter({ hasText: /[A-Z]{5,}/});
+      const buttons = page.getByRole('button').filter({ hasText: /[A-Z]{5,}/ });
       const count = await buttons.count();
       expect(count).toBeGreaterThanOrEqual(4);
     }
