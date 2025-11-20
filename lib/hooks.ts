@@ -13,6 +13,7 @@ export function useSaveProgress() {
       inventory: state.inventory,
       visitedNodes: state.visitedNodes,
       answeredQuestions: state.answeredQuestions,
+      quizAnswers: state.quizAnswers,
       lastUpdated: state.lastUpdated,
     };
 
@@ -26,6 +27,7 @@ export function useSaveProgress() {
     state.inventory,
     state.visitedNodes,
     state.answeredQuestions,
+    state.quizAnswers,
     state.lastUpdated,
   ]);
 }

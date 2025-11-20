@@ -138,7 +138,7 @@ export default function StorySegment({
             >
               <p className="text-2xl font-display font-bold mb-2">🎉 The End 🎉</p>
               <p className="text-base text-text-secondary">
-                Great job! You've completed this adventure.
+                Great job! You&apos;ve completed this adventure.
               </p>
             </motion.div>
           </div>

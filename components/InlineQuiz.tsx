@@ -115,7 +115,7 @@ export default function InlineQuiz({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
           {choices.map((choice, index) => {
             const isSelected = selectedChoiceId === choice.id;
-            const isLocked = choice.requiresItem && !inventory.includes(choice.requiresItem);
+            const isLocked = !!(choice.requiresItem && !inventory.includes(choice.requiresItem));
 
             return (
               <motion.button

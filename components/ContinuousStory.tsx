@@ -202,7 +202,7 @@ export default function ContinuousStory({
                       🎉 The End 🎉
                     </p>
                     <p className="text-lg text-text-secondary">
-                      Great job! You've completed this adventure.
+                      Great job! You&apos;ve completed this adventure.
                     </p>
                   </div>
                 </motion.div>
