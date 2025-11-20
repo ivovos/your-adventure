@@ -1,72 +1,224 @@
 import { StoryBuilderState } from './story-builder-types';
+import { VocabularyWord, selectVocabularyForStory, THEME_TO_CONTEXTS } from './vocabulary-database';
 
-export const VOCABULARY_LIST = [
-    { word: 'NECESSARY', type: 'Spelling', note: "One C, two S's" },
-    { word: 'SEPARATE', type: 'Spelling', note: 'A in the middle' },
-    { word: 'BELIEVE', type: 'Spelling', note: 'I before E' },
-    { word: 'DEFINITELY', type: 'Spelling', note: 'DEFINITE + LY' },
-    { word: 'OCCURRED', type: 'Spelling', note: 'Double R' },
-    { word: 'DISAPPEAR', type: 'Spelling', note: "One S, two P's" },
-    { word: 'CONCEALS', type: 'Verbal', note: 'Hides' },
-    { word: 'PERMANENT', type: 'Verbal', note: 'Lasting forever' },
-    { word: 'ANCIENT', type: 'Verbal', note: 'Very old' },
-    { word: 'OBTAIN', type: 'Verbal', note: 'Get or acquire' },
-    { word: 'SUFFICIENT', type: 'Verbal', note: 'Enough' },
-    { word: 'SUSPICIOUS', type: 'Verbal', note: 'Questionable' },
-    { word: 'EVIDENCE', type: 'Verbal', note: 'Proof' },
-];
+/**
+ * Advanced Prompt Engineering System for Claude-powered Story Generation
+ * Generates engaging educational stories for 9-year-olds preparing for Kent 11+ exams
+ */
 
-export const SYSTEM_PROMPT = `
-You are an expert storyteller and educational content creator for 11+ exam preparation.
-Your task is to create an interactive "Choose Your Own Adventure" style story.
-`;
+// System prompt for Claude - sets the context and quality expectations
+export const STORY_GENERATION_SYSTEM_PROMPT = `You are an expert children's storyteller and educational content creator specializing in Kent 11+ exam preparation.
 
-export function generateMasterPrompt(state: StoryBuilderState): string {
-    const vocabString = VOCABULARY_LIST.map(
-        (v) => `- ${v.word} (${v.type}: ${v.note})`
-    ).join('\n');
+Your mission is to create engaging "Choose Your Own Adventure" stories that:
+1. Captivate 9-year-old readers with exciting narratives
+2. Seamlessly integrate educational vocabulary in natural contexts
+3. Include challenging but fair spelling and verbal reasoning quizzes
+4. Feature branching paths that reward curiosity and problem-solving
 
-    return `
-**User Selections:**
-- Character: ${state.character.promptFragment}
-- Quest: ${state.quest.promptFragment}
-- World: ${state.world.promptFragment}
+Writing Guidelines:
+- Each story node should be 1-2 engaging paragraphs (150-250 words)
+- Use vivid, descriptive language that paints a picture
+- Include dialogue and action to keep the pace exciting
+- Write at a reading level appropriate for ages 9-11
+- Make vocabulary words feel natural, not forced
+- Create quiz questions that are plot-relevant, not arbitrary tests
 
-**Vocabulary List:**
-${vocabString}
+Tone: Adventurous, mysterious, sometimes humorous, always engaging. Think of blending:
+- Minecraft's creativity and exploration
+- Zelda's puzzle-solving and discovery
+- Percy Jackson's humor and relatability
 
-**Requirements:**
-1.  **Structure**: Create a branching story with at least 5-7 nodes.
-    -   Start Node
-    -   Branching paths (Choices)
-    -   At least 2 different endings (Success/Failure or Good/Best).
-2.  **Vocabulary**: Integrate at least 5 words from the VOCABULARY_LIST naturally into the story text.
-3.  **Educational Challenges**: Create 3-4 multiple-choice quizzes based on the VOCABULARY_LIST.
-    -   Quizzes must be relevant to the plot (e.g., to open a door, decode a message).
-    -   Include "Spelling" and "Verbal Reasoning" types.
-4.  **Tone**: Exciting, engaging for 10-12 year olds, but educational.
+Educational Balance:
+- Stories should be fun FIRST, educational second
+- Vocabulary emerges from context, not the other way around
+- Quizzes feel like game challenges, not school tests
+- Every choice matters to the plot`;
 
-**Output Format:**
-You must output a valid JSON object matching the 'StoryData' TypeScript interface.
-The JSON should include:
--   'title': A creative title for the story.
--   'description': A short description.
--   'startNodeId': The ID of the first node.
--   'nodes': A map of story nodes.
+// Few-shot example of high-quality story structure
+export const FEW_SHOT_EXAMPLE = `
+EXAMPLE OF HIGH-QUALITY STORY NODE:
 
-Each node must have:
--   'id': Unique string ID.
--   'title': Node title.
--   'content': At least 2 paragraphs of narrative text.
--   'choices': Array of choices (text, nextNodeId, optional educationalChallenge).
+{
+  "id": "digital-entrance",
+  "title": "The Glitching Gateway",
+  "content": "You step through the portal and emerge in a world that shouldn't exist—a massive digital realm where reality flickers like a broken screen. Towering blocks of code float in mid-air, constantly shifting between different textures: grass, stone, pure void. A pixelated river flows upward, defying gravity.\\n\\nA holographic guide materializes beside you, but it's clearly corrupted. 'Welcome to the... *bzzt*... Digital Realm,' it glitches. 'The Core has been CORRUPTED. That means it's damaged and filled with errors. You must NAVIGATE through three districts to restore it. Choose wisely—each path will test different skills.'",
+  "choices": [
+    {
+      "id": "choice-tech",
+      "text": "🤖 Enter the Tech District (circuits and robots)",
+      "nextNodeId": "tech-district",
+      "educationalChallenge": {
+        "subject": "verbal-reasoning",
+        "question": "The Core has been CORRUPTED. What does CORRUPTED mean?",
+        "options": ["Fixed", "Damaged or filled with errors", "Improved", "Hidden"],
+        "correctAnswer": "Damaged or filled with errors",
+        "hint": "Think about what happens when computer files get corrupted.",
+        "explanation": "CORRUPTED means damaged or containing errors. In computing, corrupted data is unreliable and broken."
+      }
+    }
+  ]
+}
 
-**Educational Challenge Format:**
-If a choice has a challenge, include:
--   'subject': 'spelling' or 'verbal-reasoning'
--   'question': The question text.
--   'options': 4 options.
--   'correctAnswer': The correct option.
--   'hint': A helpful hint.
--   'explanation': Why the answer is correct.
-`;
+Notice:
+- Content is 2 paragraphs, vivid and engaging
+- Vocabulary word (CORRUPTED, NAVIGATE) used naturally in context
+- Quiz question ties directly to the story
+- Challenge feels like part of the adventure, not a test`;
+
+// Generate the complete prompt for Claude
+export function generateStoryPrompt(
+  state: StoryBuilderState,
+  vocabularyWords: VocabularyWord[]
+): string {
+  // Organize vocabulary by type for clear presentation
+  const spellingWords = vocabularyWords.filter(w => w.type === 'spelling');
+  const verbalWords = vocabularyWords.filter(w => w.type === 'verbal');
+
+  // Create formatted vocabulary list with helpful context
+  const spellingList = spellingWords.map(w =>
+    `- ${w.word}: ${w.definition}${w.memoryTrick ? ` (Trick: ${w.memoryTrick})` : ''}`
+  ).join('\n');
+
+  const verbalList = verbalWords.map(w =>
+    `- ${w.word}: ${w.definition} (Synonyms: ${w.synonyms.slice(0, 2).join(', ')})`
+  ).join('\n');
+
+  return `Create an exciting educational adventure story based on these selections:
+
+📚 STORY SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Character: ${state.character.promptFragment}
+Quest: ${state.quest.promptFragment}
+World: ${state.world.promptFragment}
+
+🎯 VOCABULARY TO INTEGRATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SPELLING WORDS (use ${spellingWords.length} of these):
+${spellingList}
+
+VERBAL REASONING WORDS (use ${verbalWords.length} of these):
+${verbalList}
+
+📖 STORY REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Structure:
+- Create 6-8 story nodes minimum
+- Include branching paths (at least 2-3 major decision points)
+- Provide at least 2 different endings:
+  * One "good" ending (basic success)
+  * One "excellent" ending (achieved through clever choices or bonus challenges)
+
+Content Quality:
+- Each node should be 1-2 engaging paragraphs (150-250 words)
+- Use vivid, age-appropriate language that excites 9-year-olds
+- Include action, dialogue, and descriptive details
+- Make the reader feel like the hero of an epic adventure
+
+Educational Integration:
+- Use ALL provided vocabulary words naturally in the story text
+- Create 4-5 quiz challenges (mix of spelling and verbal reasoning)
+- Quizzes should feel like game obstacles (unlocking doors, solving riddles, decoding messages)
+- Balance: ~40% spelling challenges, ~60% verbal reasoning challenges
+- Each quiz must have:
+  * Clear question related to the plot
+  * 4 multiple choice options
+  * Helpful hint (not giving away the answer)
+  * Educational explanation for the correct answer
+
+${FEW_SHOT_EXAMPLE}
+
+🎮 OUTPUT FORMAT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Return ONLY valid JSON matching this TypeScript interface:
+
+interface StoryData {
+  title: string;           // Creative, exciting title
+  description: string;     // 1-2 sentence summary
+  startNodeId: string;     // ID of first node (usually "start")
+  nodes: {
+    [nodeId: string]: {
+      id: string;
+      title?: string;      // Optional node title
+      content: string;     // 1-2 paragraphs of narrative
+      choices?: Array<{
+        id: string;
+        text: string;      // What the player sees
+        nextNodeId: string;
+        educationalChallenge?: {
+          subject: "spelling" | "verbal-reasoning";
+          question: string;
+          options: string[];  // Exactly 4 options
+          correctAnswer: string;
+          hint?: string;
+          explanation?: string;
+        };
+      }>;
+      itemsGained?: string[];  // Optional items for inventory
+      isEnding?: boolean;      // True if this is an ending node
+    };
+  };
+}
+
+CRITICAL:
+- Your response must be ONLY the JSON object, no other text
+- Use proper JSON escaping for quotes and newlines
+- Ensure all node IDs referenced in nextNodeId actually exist in the nodes object
+- Make sure startNodeId points to a valid node
+
+Begin generating the story now!`;
+}
+
+// Helper function to select vocabulary based on story theme
+export function selectVocabularyForTheme(state: StoryBuilderState): VocabularyWord[] {
+  // Determine primary theme from world selection
+  const worldId = state.world.id;
+  const contexts = THEME_TO_CONTEXTS[worldId] || ['adventure'];
+
+  // Combine all relevant contexts
+  const allContexts = contexts.join(' ');
+
+  // Select 10-12 vocabulary words (4 spelling, 6-8 verbal)
+  return selectVocabularyForStory(allContexts, 10, 0.4);
+}
+
+// Validate generated story structure (for error handling)
+export function validateStoryStructure(story: any): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!story.title) errors.push('Missing title');
+  if (!story.description) errors.push('Missing description');
+  if (!story.startNodeId) errors.push('Missing startNodeId');
+  if (!story.nodes) errors.push('Missing nodes object');
+
+  if (story.nodes) {
+    // Check if startNodeId exists
+    if (!story.nodes[story.startNodeId]) {
+      errors.push(`Start node "${story.startNodeId}" not found in nodes`);
+    }
+
+    // Check all nextNodeId references
+    Object.entries(story.nodes).forEach(([nodeId, node]: [string, any]) => {
+      if (node.choices) {
+        node.choices.forEach((choice: any, idx: number) => {
+          if (!story.nodes[choice.nextNodeId]) {
+            errors.push(`Node "${nodeId}" choice ${idx}: references non-existent node "${choice.nextNodeId}"`);
+          }
+        });
+      }
+    });
+
+    // Check for at least one ending
+    const hasEnding = Object.values(story.nodes).some((node: any) => node.isEnding);
+    if (!hasEnding) {
+      errors.push('Story has no ending nodes');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
 }

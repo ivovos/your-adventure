@@ -7,7 +7,7 @@ export default function DesignSystemPage() {
             <header className="mb-8 max-w-7xl mx-auto">
                 <h1 className="text-4xl font-display font-bold mb-2">Design System Storyboard</h1>
                 <p className="text-text-secondary text-lg">
-                    Live preview and configuration of the application's design tokens.
+                    Live preview and configuration of the application&apos;s design tokens.
                 </p>
             </header>
 

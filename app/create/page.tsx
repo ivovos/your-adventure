@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CHARACTERS, QUESTS, WORLDS, StoryBuilderState } from '@/lib/story-builder-types';
 import { BuilderCard } from '@/components/BuilderCard';
-import { generateMasterPrompt } from '@/lib/story-prompts';
 import { useStoryStore } from '@/lib/store';
 import Link from 'next/link';
 
@@ -12,6 +11,8 @@ export default function CreateStoryPage() {
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [selections, setSelections] = useState<Partial<StoryBuilderState>>({});
     const [isGenerating, setIsGenerating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [generationProgress, setGenerationProgress] = useState<string>('');
     const router = useRouter();
 
     const addGeneratedWorld = useStoryStore((state) => state.addGeneratedWorld);
@@ -32,7 +33,14 @@ export default function CreateStoryPage() {
     const handleGenerate = async () => {
         if (selections.character && selections.quest && selections.world) {
             setIsGenerating(true);
+            setError(null);
+            setGenerationProgress('Selecting vocabulary words...');
+
             try {
+                // Simulate progress updates
+                setTimeout(() => setGenerationProgress('Crafting your unique adventure...'), 1000);
+                setTimeout(() => setGenerationProgress('Adding educational challenges...'), 3000);
+
                 const response = await fetch('/api/generate-story', {
                     method: 'POST',
                     headers: {
@@ -41,22 +49,39 @@ export default function CreateStoryPage() {
                     body: JSON.stringify(selections),
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    throw new Error('Failed to generate story');
+                    // Handle specific error cases
+                    if (response.status === 503) {
+                        throw new Error(
+                            'Story generation is not configured yet. Please add your Anthropic API key to .env.local\n\n' +
+                            'Get your API key from: https://console.anthropic.com/'
+                        );
+                    }
+                    throw new Error(data.details || data.error || 'Failed to generate story');
                 }
 
-                const data = await response.json();
+                setGenerationProgress('Finalizing your story...');
+
                 const storyData = data.story;
                 const worldId = `generated-${Date.now()}`;
 
-                // Create a new World object
+                // Create a new World object with gradient based on world type
+                const gradients: Record<string, string> = {
+                    'cyber': 'from-purple-500 to-blue-500',
+                    'forest': 'from-green-500 to-emerald-700',
+                    'space': 'from-indigo-500 to-purple-700',
+                    'underwater': 'from-blue-500 to-cyan-600',
+                };
+
                 const newWorld = {
                     id: worldId,
                     title: storyData.title,
                     description: storyData.description,
                     emoji: selections.world!.image,
-                    coverColor: 'from-purple-500 to-blue-500', // Default gradient
-                    coverGradient: 'from-purple-500 to-blue-500',
+                    coverColor: gradients[selections.world!.id] || 'from-purple-500 to-blue-500',
+                    coverGradient: gradients[selections.world!.id] || 'from-purple-500 to-blue-500',
                     locked: false,
                     storyData: storyData
                 };
@@ -65,12 +90,16 @@ export default function CreateStoryPage() {
                 addGeneratedWorld(newWorld);
                 setCurrentWorld(worldId);
 
-                // Redirect to story page
-                router.push('/story');
+                // Success! Redirect to story page
+                setGenerationProgress('Success! Starting your adventure...');
+                setTimeout(() => {
+                    router.push('/story');
+                }, 500);
 
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to generate story. Please try again.');
+            } catch (error: any) {
+                console.error('Error generating story:', error);
+                setError(error.message || 'An unexpected error occurred. Please try again.');
+                setGenerationProgress('');
             } finally {
                 setIsGenerating(false);
             }
@@ -140,6 +169,40 @@ export default function CreateStoryPage() {
                         </div>
                     )}
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                    <div className="my-8 p-6 bg-red-50 border-2 border-red-200 rounded-2xl">
+                        <div className="flex items-start gap-3">
+                            <span className="text-2xl">⚠️</span>
+                            <div className="flex-1">
+                                <h3 className="font-bold text-red-900 mb-2">Error Generating Story</h3>
+                                <p className="text-red-700 whitespace-pre-line text-sm">{error}</p>
+                                <button
+                                    onClick={() => setError(null)}
+                                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                                >
+                                    Dismiss
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Generation Progress */}
+                {isGenerating && generationProgress && (
+                    <div className="my-8 p-6 bg-accent/10 border-2 border-accent rounded-2xl">
+                        <div className="flex items-center gap-3">
+                            <span className="text-2xl animate-spin">✨</span>
+                            <div className="flex-1">
+                                <p className="text-lg font-medium text-gray-900">{generationProgress}</p>
+                                <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+                                    <div className="bg-accent h-2 rounded-full transition-all duration-500" style={{ width: '66%' }}></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="flex justify-between mt-12">
                     <button
