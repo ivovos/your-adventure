@@ -147,3 +147,4 @@ This is a personal educational project.
 - Inspired by classic choose-your-own-adventure books
 - Design influenced by iA Writer's minimal aesthetic
 - Built with educational best practices for 11+ preparation
+# your-adventure
