@@ -63,6 +63,7 @@ export interface World {
   emoji: string;
   coverColor: string;
   coverGradient: string;
+  coverImage?: string;
   locked: boolean;
   storyData?: StoryData;
 }

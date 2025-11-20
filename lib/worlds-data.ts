@@ -615,6 +615,7 @@ export const gameData: GameData = {
       emoji: '🎮',
       coverColor: '#00D632',
       coverGradient: 'from-accent to-purple',
+      coverImage: '/covers/the-glitched-realm.jpg',
       locked: false,
       storyData: glitchedRealmStory,
     },
@@ -625,6 +626,7 @@ export const gameData: GameData = {
       emoji: '✏️',
       coverColor: '#FFCF00',
       coverGradient: 'from-yellow to-orange-500',
+      coverImage: '/covers/spelling-acadamy.jpg',
       locked: true,
     },
     {
@@ -634,6 +636,7 @@ export const gameData: GameData = {
       emoji: '🧙',
       coverColor: '#A259FF',
       coverGradient: 'from-purple to-blue',
+      coverImage: '/covers/word-wizards.jpg',
       locked: true,
     },
     {
@@ -643,6 +646,7 @@ export const gameData: GameData = {
       emoji: '🏚️',
       coverColor: '#00D5FF',
       coverGradient: 'from-blue to-gray-700',
+      coverImage: '/covers/mystery-mansion.jpg',
       locked: true,
     },
   ],

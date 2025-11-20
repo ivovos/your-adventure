@@ -39,12 +39,12 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center p-6 py-12">
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6 py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-6xl"
+        className="w-full max-w-5xl"
       >
         {/* Header */}
         <div className="text-center mb-12">
@@ -69,7 +69,7 @@ export default function Home() {
         </div>
 
         {/* World Books Grid - Fixed 2 columns */}
-        <div className="grid grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto mb-12">
+        <div className="grid grid-cols-2 gap-8 md:gap-10 max-w-3xl mx-auto mb-12">
           {gameData.worlds.map((world, index) => (
             <motion.div
               key={world.id}

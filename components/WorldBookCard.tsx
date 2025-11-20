@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { World } from '@/types/story';
 
 interface WorldBookCardProps {
@@ -14,78 +15,54 @@ export default function WorldBookCard({ world, onClick }: WorldBookCardProps) {
       onClick={onClick}
       disabled={world.locked}
       className={`
-        relative group
+        relative group w-full
         ${world.locked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
       `}
-      whileHover={!world.locked ? { y: -8, rotateY: -5 } : {}}
+      whileHover={!world.locked ? { y: -4 } : {}}
       whileTap={!world.locked ? { scale: 0.98 } : {}}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
       {/* Book Container */}
-      <div className="relative w-full aspect-[3/4]">
-        {/* Book Shadow */}
-        <div className="absolute inset-0 bg-black/20 blur-xl translate-y-4 scale-95 rounded-lg" />
+      <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden shadow-lg">
+        {/* Cover Image */}
+        {world.coverImage && (
+          <Image
+            src={world.coverImage}
+            alt={world.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 50vw, 33vw"
+          />
+        )}
 
-        {/* Book Body */}
-        <div className={`
-          relative h-full w-full
-          bg-gradient-to-br ${world.coverGradient}
-          rounded-r-xl rounded-l-sm
-          shadow-2xl
-          border-r-8 border-black/20
-          ${!world.locked && 'group-hover:shadow-accent/50'}
-          transition-all duration-300
-        `}>
-          {/* Book Spine Effect */}
-          <div className="absolute left-0 top-0 bottom-0 w-6 bg-black/10 rounded-l-sm" />
-          <div className="absolute left-2 top-0 bottom-0 w-1 bg-white/20" />
+        {/* Dark Overlay for text readability */}
+        <div className="absolute inset-0 bg-black/20" />
 
-          {/* Book Content */}
-          <div className="relative h-full p-8 flex flex-col justify-center">
-            {/* Title */}
-            <div className="flex-1 flex items-center justify-center">
-              <h3 className="text-3xl font-display font-bold text-gray-900 leading-tight text-center">
-                {world.title}
-              </h3>
-            </div>
-
-            {/* Lock Badge */}
-            {world.locked && (
-              <div className="absolute top-4 right-4 bg-black/40 backdrop-blur-sm rounded-full p-3">
-                <span className="text-2xl">🔒</span>
-              </div>
-            )}
-
-            {/* New/Play Badge */}
-            {!world.locked && (
-              <motion.div
-                className="absolute -top-3 -right-3 bg-yellow text-black font-display font-bold text-sm px-4 py-2 rounded-full shadow-lg"
-                animate={{ rotate: [0, -5, 5, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                PLAY NOW
-              </motion.div>
-            )}
-          </div>
-
-          {/* Book Pages Effect */}
-          <div className="absolute right-0 top-2 bottom-2 w-1 bg-white/40 mr-2" />
-          <div className="absolute right-0 top-3 bottom-3 w-1 bg-white/30 mr-3" />
-          <div className="absolute right-0 top-4 bottom-4 w-1 bg-white/20 mr-4" />
+        {/* Title Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center p-6">
+          <h3 className="text-2xl font-display font-bold text-white leading-tight text-center drop-shadow-lg">
+            {world.title}
+          </h3>
         </div>
 
-        {/* Hover Glow Effect */}
+        {/* Lock Badge */}
+        {world.locked && (
+          <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-sm rounded-full p-2">
+            <span className="text-xl">🔒</span>
+          </div>
+        )}
+
+        {/* Play Badge */}
         {!world.locked && (
-          <div className={`
-            absolute inset-0 rounded-r-xl rounded-l-sm
-            bg-gradient-to-br ${world.coverGradient}
-            opacity-0 group-hover:opacity-30
-            blur-xl
-            transition-opacity duration-300
-            pointer-events-none
-          `} />
+          <motion.div
+            className="absolute -top-2 -right-2 bg-accent text-black font-display font-bold text-xs px-3 py-1 rounded-full shadow-lg"
+            animate={{ rotate: [0, -5, 5, -5, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+          >
+            PLAY
+          </motion.div>
         )}
       </div>
     </motion.button>
