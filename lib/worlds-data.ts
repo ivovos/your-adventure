@@ -579,7 +579,7 @@ export const gameData: GameData = {
       coverColor: '#FFCF00',
       coverGradient: 'from-yellow to-orange-500',
       coverImage: '/covers/spelling-acadamy.jpg',
-      locked: true,
+      locked: false,
     },
     {
       id: 'word-wizards',
@@ -589,7 +589,7 @@ export const gameData: GameData = {
       coverColor: '#A259FF',
       coverGradient: 'from-purple to-blue',
       coverImage: '/covers/word-wizards.jpg',
-      locked: true,
+      locked: false,
     },
     {
       id: 'mystery-mansion',
@@ -599,7 +599,7 @@ export const gameData: GameData = {
       coverColor: '#00D5FF',
       coverGradient: 'from-blue to-gray-700',
       coverImage: '/covers/mystery-mansion.jpg',
-      locked: true,
+      locked: false,
     },
   ],
 };

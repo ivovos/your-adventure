@@ -8,13 +8,15 @@ export function useSaveProgress() {
   const state = useStoryStore();
 
   useEffect(() => {
-    const saveState: PlayerState = {
+    const saveState: PlayerState & { currentWorldId: string; generatedWorlds: any[] } = {
       currentNodeId: state.currentNodeId,
       inventory: state.inventory,
       visitedNodes: state.visitedNodes,
       answeredQuestions: state.answeredQuestions,
       quizAnswers: state.quizAnswers,
       lastUpdated: state.lastUpdated,
+      currentWorldId: state.currentWorldId,
+      generatedWorlds: state.generatedWorlds,
     };
 
     try {
@@ -29,10 +31,12 @@ export function useSaveProgress() {
     state.answeredQuestions,
     state.quizAnswers,
     state.lastUpdated,
+    state.currentWorldId,
+    state.generatedWorlds,
   ]);
 }
 
-export function loadSavedProgress(): PlayerState | null {
+export function loadSavedProgress(): (PlayerState & { currentWorldId?: string; generatedWorlds?: any[] }) | null {
   if (typeof window === 'undefined') return null;
 
   try {

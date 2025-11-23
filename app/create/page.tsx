@@ -82,6 +82,7 @@ export default function CreateStoryPage() {
                     emoji: selections.world!.image,
                     coverColor: gradients[selections.world!.id] || 'from-purple-500 to-blue-500',
                     coverGradient: gradients[selections.world!.id] || 'from-purple-500 to-blue-500',
+                    coverImage: data.imageUrl,
                     locked: false,
                     storyData: storyData
                 };

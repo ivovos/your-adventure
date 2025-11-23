@@ -13,13 +13,9 @@ export default function WorldBookCard({ world, onClick }: WorldBookCardProps) {
   return (
     <motion.button
       onClick={onClick}
-      disabled={world.locked}
-      className={`
-        relative group w-full
-        ${world.locked ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}
-      `}
-      whileHover={!world.locked ? { y: -4 } : {}}
-      whileTap={!world.locked ? { scale: 0.98 } : {}}
+      className="relative group w-full cursor-pointer"
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -46,25 +42,7 @@ export default function WorldBookCard({ world, onClick }: WorldBookCardProps) {
             {world.title}
           </h3>
         </div>
-
-        {/* Lock Badge */}
-        {world.locked && (
-          <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-sm rounded-full p-2">
-            <span className="text-xl">🔒</span>
-          </div>
-        )}
-
-        {/* Play Badge */}
-        {!world.locked && (
-          <motion.div
-            className="absolute -top-2 -right-2 bg-accent text-black font-display font-bold text-xs px-3 py-1 rounded-full shadow-lg"
-            animate={{ rotate: [0, -5, 5, -5, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-          >
-            PLAY
-          </motion.div>
-        )}
       </div>
-    </motion.button>
+    </motion.button >
   );
 }

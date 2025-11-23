@@ -15,6 +15,7 @@ export default function Home() {
   const loadProgress = useStoryStore((state) => state.loadProgress);
   const resetProgress = useStoryStore((state) => state.resetProgress);
   const setCurrentWorld = useStoryStore((state) => state.setCurrentWorld);
+  const generatedWorlds = useStoryStore((state) => state.generatedWorlds);
 
   useEffect(() => {
     setCanContinue(hasSavedProgress());
@@ -22,7 +23,7 @@ export default function Home() {
 
   const handleWorldClick = (worldId: string) => {
     const world = gameData.worlds.find((w) => w.id === worldId);
-    if (!world || world.locked) return;
+    if (!world) return;
 
     // Clear any previous progress and start fresh
     clearSavedProgress();
@@ -58,17 +59,6 @@ export default function Home() {
 
           {/* Action Buttons */}
           <div className="flex flex-col items-center gap-4 mb-12">
-            {canContinue && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                onClick={handleContinue}
-                className="btn-primary w-full max-w-md"
-              >
-                📖 Continue Your Story
-              </motion.button>
-            )}
-
             <Link href="/create" className="w-full max-w-md">
               <motion.button
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -84,31 +74,44 @@ export default function Home() {
 
         {/* World Books Grid - Fixed 2 columns */}
         <div className="grid grid-cols-2 gap-8 md:gap-10 max-w-3xl mx-auto mb-12">
-          {gameData.worlds.map((world, index) => (
-            <motion.div
-              key={world.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="w-full"
-            >
-              <WorldBookCard
-                world={world}
-                onClick={() => handleWorldClick(world.id)}
-              />
-            </motion.div>
-          ))}
+          {[...gameData.worlds, ...generatedWorlds]
+            .sort((a, b) => {
+              const savedProgress = loadSavedProgress();
+              const lastPlayedId = savedProgress?.currentWorldId;
+              if (a.id === lastPlayedId) return -1;
+              if (b.id === lastPlayedId) return 1;
+              return 0;
+            })
+            .map((world, index) => {
+              const savedProgress = loadSavedProgress();
+              const isLastPlayed = savedProgress?.currentWorldId === world.id;
+
+              return (
+                <motion.div
+                  key={world.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="w-full relative"
+                >
+
+                  <WorldBookCard
+                    world={world}
+                    onClick={() => {
+                      if (isLastPlayed) {
+                        handleContinue();
+                      } else {
+                        handleWorldClick(world.id);
+                      }
+                    }}
+                  />
+                </motion.div>
+              );
+            })}
         </div>
 
-        {/* Footer Info */}
-        <div className="text-center pt-8 border-t-2 border-gray-200 max-w-2xl mx-auto">
-          <p className="text-base text-text-secondary font-display font-medium mb-2">
-            📚 Practice Verbal Reasoning & Spelling for the Kent Test
-          </p>
-          <p className="text-sm text-text-secondary/70 font-display">
-            Each adventure is designed to improve your vocabulary and spelling skills
-          </p>
-        </div>
+
+
       </motion.div>
     </main>
   );

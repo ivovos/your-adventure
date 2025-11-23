@@ -104,33 +104,39 @@ ${verbalList}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Structure:
-- Create 6-8 story nodes minimum
-- Include branching paths (at least 2-3 major decision points)
+- Create 4-6 story nodes (keep it simple and manageable)
+- Include 2-3 decision points with choices
 - Provide at least 2 different endings:
   * One "good" ending (basic success)
-  * One "excellent" ending (achieved through clever choices or bonus challenges)
+  * One "excellent" ending (achieved through clever choices)
 
 Content Quality:
-- Each node should be 1-2 engaging paragraphs (150-250 words)
-- Use vivid, age-appropriate language that excites 9-year-olds
+- Each node should be 1-2 engaging paragraphs (100-200 words)
+- Use vivid, age-appropriate language that excites 9-year-olds  
 - Include action, dialogue, and descriptive details
 - Make the reader feel like the hero of an epic adventure
+- IMPORTANT: Use only simple punctuation (periods, commas, exclamation marks)
+- AVOID: apostrophes in contractions (use "do not" instead of "don't"), complex quotes
 
 Educational Integration:
 - Use ALL provided vocabulary words naturally in the story text
-- Create 4-5 quiz challenges (mix of spelling and verbal reasoning)
-- Quizzes should feel like game obstacles (unlocking doors, solving riddles, decoding messages)
-- Balance: ~40% spelling challenges, ~60% verbal reasoning challenges
+- Create 3-4 quiz challenges (mix of spelling and verbal reasoning)
+- Quizzes should feel like game obstacles
 - Each quiz must have:
   * Clear question related to the plot
-  * 4 multiple choice options
-  * Helpful hint (not giving away the answer)
-  * Educational explanation for the correct answer
+  * Exactly 4 simple text options (no special characters)
+  * Helpful hint
+  * Educational explanation
 
 ${FEW_SHOT_EXAMPLE}
 
 🎮 OUTPUT FORMAT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ CRITICAL: Your response must be a valid JSON object wrapped in markdown code blocks.
+- Wrap the JSON in \`\`\`json and \`\`\`
+- Do not include any explanatory text outside the code blocks
+- Just the raw JSON object inside the code blocks
 
 Return ONLY valid JSON matching this TypeScript interface:
 
@@ -162,13 +168,33 @@ interface StoryData {
   };
 }
 
-CRITICAL:
-- Your response must be ONLY the JSON object, no other text
-- Use proper JSON escaping for quotes and newlines
+CRITICAL REQUIREMENTS:
+- Start your response with \`\`\`json
+- End your response with \`\`\`
+- Use proper JSON escaping for quotes (use \\" inside strings)
+- Use \\n for newlines within strings (not actual line breaks)
 - Ensure all node IDs referenced in nextNodeId actually exist in the nodes object
 - Make sure startNodeId points to a valid node
+- Wrap the JSON in markdown code blocks (\`\`\`json ... \`\`\`)
 
-Begin generating the story now!`;
+JSON FORMATTING RULES (CRITICAL):
+1. All story content must use \\\\n for line breaks. Example:
+   "content": "First paragraph.\\\\n\\\\nSecond paragraph."
+   
+2. Escape ALL quotes inside strings. Examples:
+   WRONG: "The wizard said "Hello""
+   RIGHT: "The wizard said \\\\"Hello\\\\""
+   BETTER: "The wizard said Hello"
+   
+3. Do not use apostrophes in contractions:
+   WRONG: "don't", "can't", "won't"  
+   RIGHT: "do not", "cannot", "will not"
+
+4. Keep all text simple - avoid special characters like em-dashes, curly quotes, etc.
+
+5. Every property must end with a comma EXCEPT the last one in an object.
+
+Begin generating the story JSON now!`;
 }
 
 // Helper function to select vocabulary based on story theme
@@ -204,7 +230,7 @@ export function validateStoryStructure(story: any): { valid: boolean; errors: st
       if (node.choices) {
         node.choices.forEach((choice: any, idx: number) => {
           if (!story.nodes[choice.nextNodeId]) {
-            errors.push(`Node "${nodeId}" choice ${idx}: references non-existent node "${choice.nextNodeId}"`);
+            errors.push(`Node "${nodeId}" choice ${idx}: references non - existent node "${choice.nextNodeId}"`);
           }
         });
       }

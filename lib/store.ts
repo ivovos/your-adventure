@@ -89,7 +89,11 @@ export const useStoryStore = create<StoryStore>((set) => ({
       lastUpdated: Date.now(),
     })),
 
-  resetProgress: () => set(initialState),
+  resetProgress: () =>
+    set((state) => ({
+      ...initialState,
+      generatedWorlds: state.generatedWorlds,
+    })),
 
   loadProgress: (state: PlayerState & { currentWorldId?: string; nodeStack?: string[]; generatedWorlds?: World[] }) =>
     set({
