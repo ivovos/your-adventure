@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { StoryBuilderState } from '@/lib/story-builder-types';
-import { StoryData } from '@/types/story';
+import { StoryData, StoryNode } from '@/types/story';
 import { callClaudeJSON } from '@/lib/claude-client';
+import { StoryDataSchema, StoryDataFromSchema } from '@/lib/story-schema';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import {
   STORY_GENERATION_SYSTEM_PROMPT,
@@ -50,16 +51,33 @@ export async function POST(request: Request) {
     // Generate the prompt
     const userPrompt = generateStoryPrompt(selections, vocabularyWords);
 
-    // Call Claude API
-    console.log('Calling Claude API...');
+    // Call Claude API with structured outputs
+    console.log('Calling Claude API with structured outputs...');
     const startTime = Date.now();
 
-    const generatedStory = await callClaudeJSON<StoryData>({
+    // We use StoryDataFromSchema because the schema returns nodes as an array
+    // (Claude Structured Outputs doesn't support dynamic keys/records)
+    const generatedData = await callClaudeJSON<StoryDataFromSchema>({
       systemPrompt: STORY_GENERATION_SYSTEM_PROMPT,
       userPrompt: userPrompt,
       maxTokens: 4000,
       temperature: 1.0,
+      schema: StoryDataSchema, // Use Zod schema for guaranteed valid JSON
     });
+
+    // Transform the array of nodes back into a Record<string, StoryNode>
+    // to match the application's expected StoryData structure
+    const nodesRecord: Record<string, StoryNode> = {};
+    generatedData.nodes.forEach((node) => {
+      nodesRecord[node.id] = node as unknown as StoryNode;
+    });
+
+    const generatedStory: StoryData = {
+      title: generatedData.title,
+      description: generatedData.description,
+      startNodeId: generatedData.startNodeId,
+      nodes: nodesRecord,
+    };
 
     const elapsedTime = Date.now() - startTime;
     console.log(`Story generated in ${elapsedTime}ms`);
@@ -82,36 +100,28 @@ export async function POST(request: Request) {
       nodeCount: Object.keys(generatedStory.nodes).length,
     });
 
-    // Generate Image (Nano Banana / Gemini)
+    // Generate Image with Gemini
     let imageUrl = null;
     try {
       if (process.env.GOOGLE_API_KEY) {
-        console.log('Generating image with Gemini 3 Pro Image...');
+        console.log('Generating image with Gemini 2.5 Flash Image...');
 
-        // Using the new Gemini 3 Pro Image model (Nano Banana Pro)
-        // Note: Model ID might vary based on region/availability, using the preview tag.
-        const modelId = "gemini-3.0-pro-image-preview";
-
-        const imagePrompt = `Create a 3D isometric cover image for a story titled "${generatedStory.title}". 
+        const imagePrompt = `Create a 3D isometric cover image for a children's story titled "${generatedStory.title}". 
         Description: ${generatedStory.description}. 
         Style: Vibrant colors, digital art, video game asset style, clean background, high quality, 4k, detailed texture, soft lighting. 
         No text in the image.`;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelId}:predict?key=${process.env.GOOGLE_API_KEY}`, {
+        // Use Gemini 2.5 Flash Image model
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`, {
           method: 'POST',
           headers: {
+            'x-goog-api-key': process.env.GOOGLE_API_KEY,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            instances: [
-              {
-                prompt: imagePrompt,
-              }
-            ],
-            parameters: {
-              sampleCount: 1,
-              aspectRatio: "3:4",
-            }
+            contents: [{
+              parts: [{ text: imagePrompt }]
+            }]
           })
         });
 
@@ -122,17 +132,21 @@ export async function POST(request: Request) {
 
         const data = await response.json();
 
-        // Handle response (structure is typically similar to Imagen/Vertex)
-        if (data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
-          const base64Image = data.predictions[0].bytesBase64Encoded;
-          imageUrl = `data:image/png;base64,${base64Image}`;
-          console.log('Image generated successfully using Gemini 3 Pro Image.');
-        } else if (data.predictions && data.predictions[0] && data.predictions[0].mimeType && data.predictions[0].bytesBase64Encoded) {
-          imageUrl = `data:${data.predictions[0].mimeType};base64,${data.predictions[0].bytesBase64Encoded}`;
-          console.log('Image generated successfully using Gemini 3 Pro Image.');
+        // Extract base64 image from response
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+          const imagePart = data.candidates[0].content.parts.find((part: any) => part.inlineData);
+          if (imagePart && imagePart.inlineData && imagePart.inlineData.data) {
+            const base64Image = imagePart.inlineData.data;
+            const mimeType = imagePart.inlineData.mimeType || 'image/png';
+            imageUrl = `data:${mimeType};base64,${base64Image}`;
+            console.log('Image generated successfully using Gemini 2.5 Flash Image!');
+          } else {
+            console.warn('Unexpected Gemini response structure:', JSON.stringify(data).substring(0, 200));
+            throw new Error('No image data in Gemini response');
+          }
         } else {
-          console.warn('Unexpected Gemini Image response structure:', JSON.stringify(data).substring(0, 200));
-          throw new Error('Invalid response structure from Gemini Image API');
+          console.warn('Unexpected Gemini response structure:', JSON.stringify(data).substring(0, 200));
+          throw new Error('Invalid response structure from Gemini API');
         }
 
       } else {
@@ -141,10 +155,11 @@ export async function POST(request: Request) {
         console.log('Image generated using fallback (Picsum).');
       }
     } catch (imageError: any) {
-      console.error('Failed to generate image:', imageError.message);
-      // Fallback
+      console.log('Google AI image generation failed, using fallback');
+      console.error('Details:', imageError.message);
+      // Fallback to Picsum
       imageUrl = `https://picsum.photos/seed/${encodeURIComponent(generatedStory.title)}/600/800`;
-      console.log('Image generated using fallback (Picsum) due to error.');
+      console.log('Image generated using fallback (Picsum).');
     }
 
     // Return the generated story

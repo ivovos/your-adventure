@@ -61,62 +61,93 @@ export async function callClaude(params: {
   }
 }
 
-// Helper function with structured JSON output
+// Helper function with structured JSON output using Zod schema
 export async function callClaudeJSON<T>(params: {
   systemPrompt: string;
   userPrompt: string;
   maxTokens?: number;
   temperature?: number;
+  schema?: any; // Zod schema for structured outputs
 }): Promise<T> {
-  const response = await callClaude(params);
+  const {
+    systemPrompt,
+    userPrompt,
+    maxTokens = CLAUDE_CONFIG.maxTokens,
+    temperature = CLAUDE_CONFIG.temperature,
+    schema,
+  } = params;
 
-  // Try multiple extraction strategies
-  let jsonString = response;
+  try {
+    console.log(`Calling Claude API with model: ${CLAUDE_CONFIG.model}${schema ? ' (with structured outputs)' : ''}`);
 
-  // Strategy 1: Extract from ```json code blocks
-  let jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
-  if (jsonMatch) {
-    jsonString = jsonMatch[1];
-  } else {
-    // Strategy 2: Extract from any ``` code blocks
-    jsonMatch = response.match(/```\s*([\s\S]*?)\s*```/);
+    // If schema is provided, use structured outputs (beta API)
+    if (schema) {
+      const { toJSONSchema } = await import('zod');
+
+      // Convert Zod schema to JSON Schema format using native Zod method
+      const jsonSchema = toJSONSchema(schema);
+
+      const message = await claude.beta.messages.create({
+        model: CLAUDE_CONFIG.model,
+        max_tokens: maxTokens,
+        temperature,
+        betas: ['structured-outputs-2025-11-13'],
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: userPrompt,
+          },
+        ],
+        output_format: {
+          type: 'json_schema',
+          schema: jsonSchema,
+        },
+      });
+
+      // Extract text content from response
+      const content = message.content[0];
+      if (content.type === 'text') {
+        const parsed = JSON.parse(content.text);
+        console.log('✅ Structured output generated successfully');
+        return parsed;
+      }
+
+      throw new Error('Unexpected response format from Claude API');
+    }
+
+    // Fallback to legacy JSON parsing (for backward compatibility)
+    const response = await callClaude({ systemPrompt, userPrompt, maxTokens, temperature });
+
+    // Try multiple extraction strategies
+    let jsonString = response;
+
+    // Strategy 1: Extract from ```json code blocks
+    let jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
     if (jsonMatch) {
       jsonString = jsonMatch[1];
     } else {
-      // Strategy 3: Try to find JSON object in the response
-      const objectMatch = response.match(/\{[\s\S]*\}/);
-      if (objectMatch) {
-        jsonString = objectMatch[0];
+      // Strategy 2: Extract from any ``` code blocks
+      jsonMatch = response.match(/```\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        jsonString = jsonMatch[1];
+      } else {
+        // Strategy 3: Try to find JSON object in the response
+        const objectMatch = response.match(/\{[\s\S]*\}/);
+        if (objectMatch) {
+          jsonString = objectMatch[0];
+        }
       }
     }
-  }
 
-  // Sanitize JSON string to fix common issues
-  jsonString = sanitizeJSONString(jsonString);
+    // Sanitize JSON string to fix common issues
+    jsonString = sanitizeJSONString(jsonString);
 
-  try {
     const parsed = JSON.parse(jsonString.trim());
     return parsed;
   } catch (error) {
     console.error('Failed to parse JSON from Claude response');
-    console.error('Response length:', response.length);
-    console.error('First 500 chars:', response.substring(0, 500));
-    console.error('Last 500 chars:', response.substring(Math.max(0, response.length - 500)));
-    console.error('Attempted JSON string length:', jsonString.length);
     console.error('Parse error:', error);
-
-    // Try to find the exact position of the error
-    if (error instanceof SyntaxError && error.message.includes('position')) {
-      const match = error.message.match(/position (\d+)/);
-      if (match) {
-        const pos = parseInt(match[1]);
-        const start = Math.max(0, pos - 100);
-        const end = Math.min(jsonString.length, pos + 100);
-        console.error('Context around error position:', jsonString.substring(start, end));
-        console.error('Error at character:', jsonString[pos]);
-      }
-    }
-
     throw new Error(`Claude returned invalid JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
