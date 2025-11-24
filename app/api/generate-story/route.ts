@@ -3,7 +3,7 @@ import { StoryBuilderState } from '@/lib/story-builder-types';
 import { StoryData, StoryNode } from '@/types/story';
 import { callClaudeJSON } from '@/lib/claude-client';
 import { StoryDataSchema, StoryDataFromSchema } from '@/lib/story-schema';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import {
   STORY_GENERATION_SYSTEM_PROMPT,
   generateStoryPrompt,
@@ -102,51 +102,43 @@ export async function POST(request: Request) {
 
     // Generate Image with Gemini
     let imageUrl = null;
+    let imageGenerationError = null;
     try {
       if (process.env.GOOGLE_API_KEY) {
-        console.log('Generating image with Gemini 2.5 Flash Image...');
+        console.log('Generating image with Imagen 4.0...');
 
-        const imagePrompt = `Create a 3D isometric cover image for a children's story titled "${generatedStory.title}". 
+        const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+
+        const imagePrompt = `Create a 3D isometric cover image for a children's story. 
         Description: ${generatedStory.description}. 
         Style: Vibrant colors, digital art, video game asset style, clean background, high quality, 4k, detailed texture, soft lighting. 
-        No text in the image.`;
+        IMPORTANT: Do NOT include any text, letters, or the title "${generatedStory.title}" in the image. The image should be purely visual.`;
 
-        // Use Gemini 2.5 Flash Image model
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent`, {
-          method: 'POST',
-          headers: {
-            'x-goog-api-key': process.env.GOOGLE_API_KEY,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: imagePrompt }]
-            }]
-          })
-        });
+        try {
+          const response = await ai.models.generateImages({
+            model: 'imagen-4.0-generate-001',
+            prompt: imagePrompt,
+            config: {
+              numberOfImages: 1,
+            },
+          });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Gemini Image API failed: ${response.status} ${errorText}`);
-        }
-
-        const data = await response.json();
-
-        // Extract base64 image from response
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-          const imagePart = data.candidates[0].content.parts.find((part: any) => part.inlineData);
-          if (imagePart && imagePart.inlineData && imagePart.inlineData.data) {
-            const base64Image = imagePart.inlineData.data;
-            const mimeType = imagePart.inlineData.mimeType || 'image/png';
-            imageUrl = `data:${mimeType};base64,${base64Image}`;
-            console.log('Image generated successfully using Gemini 2.5 Flash Image!');
+          if (response.generatedImages && response.generatedImages.length > 0) {
+            const generatedImage = response.generatedImages[0];
+            if (generatedImage.image && generatedImage.image.imageBytes) {
+              const imgBytes = generatedImage.image.imageBytes;
+              // The SDK returns base64 bytes directly in imageBytes
+              imageUrl = `data:image/png;base64,${imgBytes}`;
+              console.log('Image generated successfully using Imagen 4.0!');
+            } else {
+              throw new Error('No image bytes in response');
+            }
           } else {
-            console.warn('Unexpected Gemini response structure:', JSON.stringify(data).substring(0, 200));
-            throw new Error('No image data in Gemini response');
+            throw new Error('No images generated');
           }
-        } else {
-          console.warn('Unexpected Gemini response structure:', JSON.stringify(data).substring(0, 200));
-          throw new Error('Invalid response structure from Gemini API');
+        } catch (innerError: any) {
+          console.error('Google GenAI SDK Error:', JSON.stringify(innerError, Object.getOwnPropertyNames(innerError), 2));
+          throw innerError;
         }
 
       } else {
@@ -156,7 +148,9 @@ export async function POST(request: Request) {
       }
     } catch (imageError: any) {
       console.log('Google AI image generation failed, using fallback');
-      console.error('Details:', imageError.message);
+      console.error('Full Error Details:', imageError);
+      imageGenerationError = imageError.message || 'Unknown error';
+
       // Fallback to Picsum
       imageUrl = `https://picsum.photos/seed/${encodeURIComponent(generatedStory.title)}/600/800`;
       console.log('Image generated using fallback (Picsum).');
@@ -170,6 +164,7 @@ export async function POST(request: Request) {
         vocabularyCount: vocabularyWords.length,
         nodeCount: Object.keys(generatedStory.nodes).length,
         generationTime: elapsedTime,
+        imageGenerationError: imageGenerationError,
       },
     });
 

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { hasSavedProgress, loadSavedProgress, clearSavedProgress } from '@/lib/hooks';
+import { hasSavedProgress, clearSavedProgress } from '@/lib/hooks';
 import { useStoryStore } from '@/lib/store';
 import { gameData } from '@/lib/worlds-data';
 import WorldBookCard from '@/components/WorldBookCard';
@@ -12,33 +12,47 @@ import WorldBookCard from '@/components/WorldBookCard';
 export default function Home() {
   const router = useRouter();
   const [canContinue, setCanContinue] = useState(false);
-  const loadProgress = useStoryStore((state) => state.loadProgress);
+  const [isHydrated, setIsHydrated] = useState(false);
+
   const resetProgress = useStoryStore((state) => state.resetProgress);
   const setCurrentWorld = useStoryStore((state) => state.setCurrentWorld);
   const generatedWorlds = useStoryStore((state) => state.generatedWorlds);
+  const currentWorldId = useStoryStore((state) => state.currentWorldId);
 
   useEffect(() => {
     setCanContinue(hasSavedProgress());
+    setIsHydrated(true);
   }, []);
 
   const handleWorldClick = (worldId: string) => {
-    const world = gameData.worlds.find((w) => w.id === worldId);
+    // Look in both static and generated worlds
+    const world = [...gameData.worlds, ...generatedWorlds].find((w) => w.id === worldId);
     if (!world) return;
 
     // Clear any previous progress and start fresh
-    clearSavedProgress();
+    // We don't need to clearSavedProgress() from localStorage anymore as zustand handles it
+    // But we might want to reset the store state for a new run
     resetProgress();
     setCurrentWorld(worldId);
     router.push('/story');
   };
 
   const handleContinue = () => {
-    const savedProgress = loadSavedProgress();
-    if (savedProgress) {
-      loadProgress(savedProgress);
+    // With zustand persist, the state is already loaded.
+    // We just need to ensure we have a valid world ID
+    if (currentWorldId) {
+      router.push('/story');
+    } else {
+      // Fallback if something is wrong
+      router.push('/');
     }
-    router.push('/story');
   };
+
+  // Combine static and generated worlds
+  // Only show generated worlds after hydration to avoid server/client mismatch
+  const allWorlds = isHydrated
+    ? [...gameData.worlds, ...generatedWorlds]
+    : [...gameData.worlds];
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6 py-12">
@@ -74,17 +88,16 @@ export default function Home() {
 
         {/* World Books Grid - Fixed 2 columns */}
         <div className="grid grid-cols-2 gap-8 md:gap-10 max-w-3xl mx-auto mb-12">
-          {[...gameData.worlds, ...generatedWorlds]
+          {allWorlds
             .sort((a, b) => {
-              const savedProgress = loadSavedProgress();
-              const lastPlayedId = savedProgress?.currentWorldId;
-              if (a.id === lastPlayedId) return -1;
-              if (b.id === lastPlayedId) return 1;
+              // Sort by last played if hydrated
+              if (!isHydrated) return 0;
+              if (a.id === currentWorldId) return -1;
+              if (b.id === currentWorldId) return 1;
               return 0;
             })
             .map((world, index) => {
-              const savedProgress = loadSavedProgress();
-              const isLastPlayed = savedProgress?.currentWorldId === world.id;
+              const isLastPlayed = isHydrated && currentWorldId === world.id;
 
               return (
                 <motion.div
@@ -109,8 +122,6 @@ export default function Home() {
               );
             })}
         </div>
-
-
 
       </motion.div>
     </main>

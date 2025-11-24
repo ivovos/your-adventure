@@ -11,14 +11,23 @@
   --color-accent: #00D632;
   --color-accent-hover: #00BD2A;
   --color-accent-dark: #00A023;
-  --color-purple: #A259FF;
-  --color-blue: #00D5FF;
-  --color-yellow: #FFCF00;
+  --color-accent-dark: #00A023;
 
   /* Fonts */
-  --font-serif: 'Charter', 'Iowan Old Style', 'Georgia', 'serif';
-  --font-sans: '-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Inter', 'sans-serif';
-  --font-display: '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif';
+  --font-bricolage: 'Bricolage Grotesque', sans-serif;
+  --font-atkinson: 'Atkinson Hyperlegible', sans-serif;
+  --font-fraunces: 'Fraunces', serif;
+  --font-general-sans: 'General Sans', sans-serif;
+  --font-cabinet: 'Cabinet Grotesk', sans-serif;
+  --font-literata: 'Literata', serif;
+  --font-instrument: 'Instrument Serif', serif;
+  --font-source-sans: 'Source Sans 3', sans-serif;
+
+  /* Default Fonts (will be overridden by JS) */
+  --font-serif: var(--font-literata);
+  --font-sans: var(--font-general-sans);
+  --font-display: var(--font-cabinet);
+  --font-body: var(--font-general-sans);
 
   /* Layout */
   --max-width-reading: 680px;
@@ -98,7 +107,8 @@
   }
 
   body {
-    @apply bg-background text-text-primary font-serif antialiased;
+    @apply bg-background text-text-primary font-sans antialiased;
+    font-family: var(--font-body);
     font-size: 19px;
     line-height: 1.6;
   }
@@ -150,6 +160,7 @@
 
   .story-content {
     @apply text-lg md:text-xl leading-relaxed mb-8;
+    font-family: var(--font-body);
   }
 
   .fade-in {

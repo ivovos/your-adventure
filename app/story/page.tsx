@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ContinuousStory from '@/components/ContinuousStory';
 import { useStoryStore } from '@/lib/store';
-import { useSaveProgress } from '@/lib/hooks';
 import { gameData } from '@/lib/worlds-data';
 
 export default function Story() {
@@ -19,8 +18,7 @@ export default function Story() {
 
   const generatedWorlds = useStoryStore((state) => state.generatedWorlds);
 
-  // Auto-save progress
-  useSaveProgress();
+  // Auto-save progress is now handled by zustand persist middleware
 
   // Get current world
   const currentWorld = gameData.worlds.find((w) => w.id === currentWorldId) ||

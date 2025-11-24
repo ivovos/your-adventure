@@ -11,9 +11,10 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['var(--font-serif)'],
+        serif: ['var(--font-body)'],
         sans: ['var(--font-sans)'],
         display: ['var(--font-display)'],
+        body: ['var(--font-body)'],
       },
       colors: {
         'text-primary': 'var(--color-text-primary)',
