@@ -51,33 +51,88 @@ export async function POST(request: Request) {
     // Generate the prompt
     const userPrompt = generateStoryPrompt(selections, vocabularyWords);
 
-    // Call Claude API with structured outputs
-    console.log('Calling Claude API with structured outputs...');
     const startTime = Date.now();
 
-    // We use StoryDataFromSchema because the schema returns nodes as an array
-    // (Claude Structured Outputs doesn't support dynamic keys/records)
-    const generatedData = await callClaudeJSON<StoryDataFromSchema>({
-      systemPrompt: STORY_GENERATION_SYSTEM_PROMPT,
-      userPrompt: userPrompt,
-      maxTokens: 4000,
-      temperature: 1.0,
-      schema: StoryDataSchema, // Use Zod schema for guaranteed valid JSON
-    });
+    // Start both processes in parallel
+    const storyPromise = (async () => {
+      console.log('Calling Claude API with structured outputs...');
+      // We use StoryDataFromSchema because the schema returns nodes as an array
+      // (Claude Structured Outputs doesn't support dynamic keys/records)
+      const generatedData = await callClaudeJSON<StoryDataFromSchema>({
+        systemPrompt: STORY_GENERATION_SYSTEM_PROMPT,
+        userPrompt: userPrompt,
+        maxTokens: 4000,
+        temperature: 1.0,
+        schema: StoryDataSchema, // Use Zod schema for guaranteed valid JSON
+      });
 
-    // Transform the array of nodes back into a Record<string, StoryNode>
-    // to match the application's expected StoryData structure
-    const nodesRecord: Record<string, StoryNode> = {};
-    generatedData.nodes.forEach((node) => {
-      nodesRecord[node.id] = node as unknown as StoryNode;
-    });
+      // Transform the array of nodes back into a Record<string, StoryNode>
+      const nodesRecord: Record<string, StoryNode> = {};
+      generatedData.nodes.forEach((node) => {
+        nodesRecord[node.id] = node as unknown as StoryNode;
+      });
 
-    const generatedStory: StoryData = {
-      title: generatedData.title,
-      description: generatedData.description,
-      startNodeId: generatedData.startNodeId,
-      nodes: nodesRecord,
-    };
+      return {
+        title: generatedData.title,
+        description: generatedData.description,
+        startNodeId: generatedData.startNodeId,
+        nodes: nodesRecord,
+      } as StoryData;
+    })();
+
+    const imagePromise = (async () => {
+      if (!process.env.GOOGLE_API_KEY) {
+        console.log('GOOGLE_API_KEY not found, skipping image generation');
+        return {
+          url: `https://picsum.photos/seed/${encodeURIComponent(selections.quest.label)}/600/800`,
+          error: null
+        };
+      }
+
+      const imageGenStartTime = Date.now();
+      console.log('Generating image with Imagen 4.0...');
+
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
+
+        // Use selections to generate image prompt immediately
+        const imagePrompt = `Create a 3D isometric cover image for a children's story. 
+        Description: A story about ${selections.character.promptFragment} going on ${selections.quest.promptFragment} in ${selections.world.promptFragment}.
+        Style: Vibrant colors, digital art, video game asset style, clean background, high quality, 4k, detailed texture, soft lighting. 
+        IMPORTANT: Do NOT include any text, letters, or the title in the image. The image should be purely visual.`;
+
+        const response = await ai.models.generateImages({
+          model: 'imagen-4.0-generate-001',
+          prompt: imagePrompt,
+          config: {
+            numberOfImages: 1,
+          },
+        });
+
+        if (response.generatedImages && response.generatedImages.length > 0) {
+          const generatedImage = response.generatedImages[0];
+          if (generatedImage.image && generatedImage.image.imageBytes) {
+            const imgBytes = generatedImage.image.imageBytes;
+            console.log(`Image generated successfully using Imagen 4.0 in ${Date.now() - imageGenStartTime}ms`);
+            return {
+              url: `data:image/png;base64,${imgBytes}`,
+              error: null
+            };
+          }
+        }
+        throw new Error('No image bytes in response');
+      } catch (error: any) {
+        console.log(`Google AI image generation failed after ${Date.now() - imageGenStartTime}ms, using fallback`);
+        console.error('Full Error Details:', error);
+        return {
+          url: `https://picsum.photos/seed/${encodeURIComponent(selections.quest.label)}/600/800`,
+          error: error.message || 'Unknown error'
+        };
+      }
+    })();
+
+    // Wait for both to complete
+    const [generatedStory, imageResult] = await Promise.all([storyPromise, imagePromise]);
 
     const elapsedTime = Date.now() - startTime;
     console.log(`Story generated in ${elapsedTime}ms`);
@@ -100,61 +155,11 @@ export async function POST(request: Request) {
       nodeCount: Object.keys(generatedStory.nodes).length,
     });
 
-    // Generate Image with Gemini
-    let imageUrl = null;
-    let imageGenerationError = null;
-    try {
-      if (process.env.GOOGLE_API_KEY) {
-        console.log('Generating image with Imagen 4.0...');
+    const imageUrl = imageResult.url;
+    const imageGenerationError = imageResult.error;
 
-        const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
-
-        const imagePrompt = `Create a 3D isometric cover image for a children's story. 
-        Description: ${generatedStory.description}. 
-        Style: Vibrant colors, digital art, video game asset style, clean background, high quality, 4k, detailed texture, soft lighting. 
-        IMPORTANT: Do NOT include any text, letters, or the title "${generatedStory.title}" in the image. The image should be purely visual.`;
-
-        try {
-          const response = await ai.models.generateImages({
-            model: 'imagen-4.0-generate-001',
-            prompt: imagePrompt,
-            config: {
-              numberOfImages: 1,
-            },
-          });
-
-          if (response.generatedImages && response.generatedImages.length > 0) {
-            const generatedImage = response.generatedImages[0];
-            if (generatedImage.image && generatedImage.image.imageBytes) {
-              const imgBytes = generatedImage.image.imageBytes;
-              // The SDK returns base64 bytes directly in imageBytes
-              imageUrl = `data:image/png;base64,${imgBytes}`;
-              console.log('Image generated successfully using Imagen 4.0!');
-            } else {
-              throw new Error('No image bytes in response');
-            }
-          } else {
-            throw new Error('No images generated');
-          }
-        } catch (innerError: any) {
-          console.error('Google GenAI SDK Error:', JSON.stringify(innerError, Object.getOwnPropertyNames(innerError), 2));
-          throw innerError;
-        }
-
-      } else {
-        console.log('GOOGLE_API_KEY not found, skipping image generation');
-        imageUrl = `https://picsum.photos/seed/${encodeURIComponent(generatedStory.title)}/600/800`;
-        console.log('Image generated using fallback (Picsum).');
-      }
-    } catch (imageError: any) {
-      console.log('Google AI image generation failed, using fallback');
-      console.error('Full Error Details:', imageError);
-      imageGenerationError = imageError.message || 'Unknown error';
-
-      // Fallback to Picsum
-      imageUrl = `https://picsum.photos/seed/${encodeURIComponent(generatedStory.title)}/600/800`;
-      console.log('Image generated using fallback (Picsum).');
-    }
+    const totalTime = Date.now() - startTime;
+    console.log(`Total request processing time: ${totalTime}ms`);
 
     // Return the generated story
     return NextResponse.json({

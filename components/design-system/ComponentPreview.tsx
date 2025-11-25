@@ -16,12 +16,12 @@ export default function ComponentPreview() {
                     <h1 className="text-5xl font-display font-bold">Heading 1 (Display)</h1>
                     <h2 className="text-4xl font-display font-bold">Heading 2 (Display)</h2>
                     <h3 className="text-3xl font-display font-bold">Heading 3 (Display)</h3>
-                    <p className="text-xl font-serif">
-                        Body text using the serif font family. This is used for the main story content.
+                    <p className="text-xl font-body">
+                        Body text using the selected body font family. This is used for the main story content.
                         It should be readable and comfortable for long reading sessions.
                     </p>
-                    <p className="text-sm text-muted-foreground font-sans">
-                        Small text or metadata using the sans-serif font family.
+                    <p className="text-sm text-muted-foreground font-body">
+                        Small text or metadata using the body font family.
                     </p>
                 </div>
             </section>
@@ -55,13 +55,13 @@ export default function ComponentPreview() {
                 <div className="grid md:grid-cols-2 gap-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Card Title</CardTitle>
-                            <CardDescription>Card Description goes here.</CardDescription>
+                            <CardTitle className="font-display text-3xl">Card Title</CardTitle>
+                            <CardDescription className="font-body text-lg">Card Description goes here.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label htmlFor="email">Email</Label>
-                                <Input type="email" id="email" placeholder="Email" />
+                                <Label htmlFor="email" className="font-display text-sm font-semibold">Email</Label>
+                                <Input type="email" id="email" placeholder="Email" className="font-display text-sm" />
                             </div>
                         </CardContent>
                         <CardFooter>
@@ -71,13 +71,13 @@ export default function ComponentPreview() {
 
                     <div className="space-y-4">
                         <div className="choice-button group cursor-pointer">
-                            <span className="font-bold">Choice Button</span>
-                            <p className="text-sm text-text-secondary mt-1">Hover me to see the effect</p>
+                            <span className="font-display font-bold">Choice Button</span>
+                            <p className="font-body text-sm text-text-secondary mt-1">Hover me to see the effect</p>
                         </div>
 
                         <div className="bg-background p-6 rounded-2xl border-2 border-accent shadow-sm">
-                            <h3 className="text-accent mb-2 font-bold">Active State Card</h3>
-                            <p>This card demonstrates the accent color usage in borders and text.</p>
+                            <h3 className="font-display text-accent mb-2 font-bold">Active State Card</h3>
+                            <p className="font-body">This card demonstrates the accent color usage in borders and text.</p>
                         </div>
                     </div>
                 </div>

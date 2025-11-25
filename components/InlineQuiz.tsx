@@ -23,17 +23,7 @@ export default function InlineQuiz({
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeChoice, setActiveChoice] = useState<Choice | null>(null);
   const [showChallenge, setShowChallenge] = useState(false);
-  const quizRef = useRef<HTMLDivElement>(null);
   const isCompleted = selectedChoiceId !== null;
-
-  // Auto-scroll to center quiz when it appears
-  useEffect(() => {
-    if (!isCompleted && quizRef.current) {
-      setTimeout(() => {
-        quizRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
-  }, [isCompleted]);
 
   const handleChoiceClick = (choice: Choice) => {
     if (isCompleted) return;

@@ -11,9 +11,8 @@
   --color-accent: #00D632;
   --color-accent-hover: #00BD2A;
   --color-accent-dark: #00A023;
-  --color-accent-dark: #00A023;
 
-  /* Fonts */
+  /* Fonts - Source Definitions */
   --font-bricolage: 'Bricolage Grotesque', sans-serif;
   --font-atkinson: 'Atkinson Hyperlegible', sans-serif;
   --font-fraunces: 'Fraunces', serif;
@@ -23,11 +22,9 @@
   --font-instrument: 'Instrument Serif', serif;
   --font-source-sans: 'Source Sans 3', sans-serif;
 
-  /* Default Fonts (will be overridden by JS) */
-  --font-serif: var(--font-literata);
-  --font-sans: var(--font-general-sans);
+  /* Semantic Font Mappings (Default) */
   --font-display: var(--font-cabinet);
-  --font-body: var(--font-general-sans);
+  --font-body: var(--font-atkinson);
 
   /* Layout */
   --max-width-reading: 680px;
@@ -107,9 +104,10 @@
   }
 
   body {
-    @apply bg-background text-text-primary font-sans antialiased;
+    @apply bg-background text-text-primary antialiased;
     font-family: var(--font-body);
-    font-size: 19px;
+    font-size: 18px;
+    /* Slightly refined base size */
     line-height: 1.6;
   }
 
@@ -119,9 +117,12 @@
   h4,
   h5,
   h6 {
-    @apply font-display font-bold;
+    font-family: var(--font-display);
+    font-weight: 700;
+    /* Bold by default for display */
     line-height: 1.1;
     letter-spacing: -0.02em;
+    color: var(--color-text-primary);
   }
 
   h1 {
@@ -129,15 +130,17 @@
   }
 
   h2 {
-    @apply text-4xl md:text-5xl mb-4;
+    @apply text-4xl md:text-5xl mb-5;
+    /* Increased margin slightly */
   }
 
   h3 {
-    @apply text-3xl md:text-4xl mb-3;
+    @apply text-3xl md:text-4xl mb-4;
   }
 
   button {
-    @apply font-display font-semibold;
+    font-family: var(--font-display);
+    font-weight: 600;
   }
 }
 
@@ -183,5 +186,14 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

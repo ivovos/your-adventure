@@ -1,10 +1,9 @@
 'use client';
 
-import { useDesignSystemStore, TYPOGRAPHY_PRESETS, TypographyPreset, TypographyPresetConfig } from '@/lib/stores/design-system';
-import { cn } from '@/lib/utils';
+import { useDesignSystemStore, FONT_OPTIONS, FontOption } from '@/lib/stores/design-system';
 
 export default function ThemeControls() {
-    const { colors, fonts, borderRadius, typographyPreset, setColors, setFonts, setBorderRadius, setTypographyPreset, reset } = useDesignSystemStore();
+    const { colors, borderRadius, displayFont, bodyFont, setColors, setBorderRadius, setDisplayFont, setBodyFont, reset } = useDesignSystemStore();
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-full overflow-y-auto">
@@ -44,44 +43,45 @@ export default function ThemeControls() {
                     </div>
                 </section>
 
-                {/* Typography Presets Section */}
-                <section>
-                    <h3 className="text-lg font-display font-semibold mb-4">Typography</h3>
-                    <div className="grid grid-cols-1 gap-3">
-                        {(Object.entries(TYPOGRAPHY_PRESETS) as [TypographyPreset, TypographyPresetConfig][]).map(([key, preset]) => (
-                            <button
-                                key={key}
-                                onClick={() => setTypographyPreset(key)}
-                                className={cn(
-                                    "text-left p-4 rounded-xl border-2 transition-all",
-                                    typographyPreset === key
-                                        ? "border-accent bg-accent/5"
-                                        : "border-border bg-background-subtle hover:border-accent/50"
-                                )}
-                            >
-                                <div className="font-display font-semibold text-sm mb-1">{preset.name}</div>
-                                <div className="text-xs text-text-secondary">{preset.vibe}</div>
-                            </button>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Font Customization (Advanced) */}
+                {/* Typography Section */}
                 <section>
                     <h3 className="text-lg font-display font-semibold mb-4">Typography</h3>
                     <div className="space-y-4">
-                        {Object.entries(fonts).map(([key, value]) => (
-                            <div key={key} className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700 capitalize">
-                                    {key} Font Family
-                                </label>
-                                <textarea
-                                    value={value}
-                                    onChange={(e) => setFonts({ [key]: e.target.value })}
-                                    className="w-full px-3 py-2 text-sm border rounded-md h-20 font-mono"
-                                />
-                            </div>
-                        ))}
+                        {/* Display Font */}
+                        <div>
+                            <label className="text-sm font-medium text-text-secondary mb-2 block">
+                                Display Font (Headings)
+                            </label>
+                            <select
+                                value={displayFont}
+                                onChange={(e) => setDisplayFont(e.target.value as FontOption)}
+                                className="w-full px-4 py-3 border-2 border-border rounded-xl bg-background font-display font-semibold hover:border-accent transition-colors cursor-pointer"
+                            >
+                                {(Object.entries(FONT_OPTIONS) as [FontOption, { name: string }][]).map(([key, { name }]) => (
+                                    <option key={key} value={key}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Body Font */}
+                        <div>
+                            <label className="text-sm font-medium text-text-secondary mb-2 block">
+                                Body Font (Content)
+                            </label>
+                            <select
+                                value={bodyFont}
+                                onChange={(e) => setBodyFont(e.target.value as FontOption)}
+                                className="w-full px-4 py-3 border-2 border-border rounded-xl bg-background font-display font-semibold hover:border-accent transition-colors cursor-pointer"
+                            >
+                                {(Object.entries(FONT_OPTIONS) as [FontOption, { name: string }][]).map(([key, { name }]) => (
+                                    <option key={key} value={key}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </section>
 
@@ -91,7 +91,7 @@ export default function ThemeControls() {
                     <div className="space-y-4">
                         {Object.entries(borderRadius).map(([key, value]) => (
                             <div key={key} className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-gray-700 uppercase">
+                                <label className="text-sm font-medium text-text-secondary uppercase">
                                     {key}
                                 </label>
                                 <input
