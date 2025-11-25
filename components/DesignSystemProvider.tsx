@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useDesignSystemStore, TYPOGRAPHY_PRESETS } from '@/lib/stores/design-system';
+import { useDesignSystemStore, FONT_OPTIONS } from '@/lib/stores/design-system';
 
 export default function DesignSystemProvider() {
-    const { colors, fonts, borderRadius, typographyPreset } = useDesignSystemStore();
+    const { colors, fonts, borderRadius, displayFont, bodyFont } = useDesignSystemStore();
 
     useEffect(() => {
         const root = document.documentElement;
@@ -31,29 +31,14 @@ export default function DesignSystemProvider() {
         root.style.setProperty('--radius-3xl', borderRadius['3xl']);
     }, [colors, fonts, borderRadius]);
 
-    // Apply Typography Preset
+    // Apply Typography Selections
     useEffect(() => {
         const root = document.documentElement;
-        const preset = TYPOGRAPHY_PRESETS[typographyPreset];
 
-        // Apply font families
-        root.style.setProperty('--font-body', preset.body);
-        root.style.setProperty('--font-display', preset.display);
-
-        // Apply font-variation-settings for headings
-        if (preset.displaySettings) {
-            root.style.setProperty('--font-display-settings', preset.displaySettings);
-        } else {
-            root.style.removeProperty('--font-display-settings');
-        }
-
-        // Apply font-variation-settings for body
-        if (preset.bodySettings) {
-            root.style.setProperty('--font-body-settings', preset.bodySettings);
-        } else {
-            root.style.removeProperty('--font-body-settings');
-        }
-    }, [typographyPreset]);
+        // Apply selected fonts
+        root.style.setProperty('--font-body', FONT_OPTIONS[bodyFont].variable);
+        root.style.setProperty('--font-display', FONT_OPTIONS[displayFont].variable);
+    }, [displayFont, bodyFont]);
 
     return null;
 }

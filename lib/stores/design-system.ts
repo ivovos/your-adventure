@@ -1,63 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type TypographyPreset = 'bricolage-atkinson' | 'fraunces-general' | 'cabinet-literata' | 'cabinet-atkinson' | 'instrument-source' | 'fraunces-only' | 'cabinet-only';
+export type FontOption = 'bricolage' | 'atkinson' | 'fraunces' | 'general-sans' | 'cabinet' | 'literata' | 'instrument' | 'source-sans';
 
-export interface TypographyPresetConfig {
-    name: string;
-    vibe: string;
-    display: string;
-    body: string;
-    displaySettings?: string;
-    bodySettings?: string;
-}
-
-export const TYPOGRAPHY_PRESETS: Record<TypographyPreset, TypographyPresetConfig> = {
-    'bricolage-atkinson': {
-        name: 'Bricolage + Atkinson',
-        vibe: 'Playful meets functional',
-        display: 'var(--font-bricolage)',
-        body: 'var(--font-atkinson)',
-    },
-    'fraunces-general': {
-        name: 'Fraunces + General Sans',
-        vibe: 'Characterful serif with clean sans',
-        display: 'var(--font-fraunces)',
-        body: 'var(--font-general-sans)',
-        displaySettings: "'SOFT' 100",
-    },
-    'cabinet-literata': {
-        name: 'Cabinet Grotesk + Literata',
-        vibe: 'Confident and approachable',
-        display: 'var(--font-cabinet)',
-        body: 'var(--font-literata)',
-    },
-    'cabinet-atkinson': {
-        name: 'Cabinet Grotesk + Atkinson',
-        vibe: 'Modern and highly readable',
-        display: 'var(--font-cabinet)',
-        body: 'var(--font-atkinson)',
-    },
-    'instrument-source': {
-        name: 'Instrument Serif + Source Sans',
-        vibe: 'Sophisticated but friendly',
-        display: 'var(--font-instrument)',
-        body: 'var(--font-source-sans)',
-    },
-    'fraunces-only': {
-        name: 'Fraunces Variable',
-        vibe: 'Cohesive, uses variable font axis',
-        display: 'var(--font-fraunces)',
-        body: 'var(--font-fraunces)',
-        displaySettings: "'SOFT' 100",
-        bodySettings: "'SOFT' 0",
-    },
-    'cabinet-only': {
-        name: 'Cabinet Grotesk Only',
-        vibe: 'Unified, confident',
-        display: 'var(--font-cabinet)',
-        body: 'var(--font-cabinet)',
-    },
+export const FONT_OPTIONS: Record<FontOption, { name: string; variable: string }> = {
+    'bricolage': { name: 'Bricolage Grotesque', variable: 'var(--font-bricolage)' },
+    'atkinson': { name: 'Atkinson Hyperlegible', variable: 'var(--font-atkinson)' },
+    'fraunces': { name: 'Fraunces', variable: 'var(--font-fraunces)' },
+    'general-sans': { name: 'General Sans', variable: 'var(--font-general-sans)' },
+    'cabinet': { name: 'Cabinet Grotesk', variable: 'var(--font-cabinet)' },
+    'literata': { name: 'Literata', variable: 'var(--font-literata)' },
+    'instrument': { name: 'Instrument Serif', variable: 'var(--font-instrument)' },
+    'source-sans': { name: 'Source Sans 3', variable: 'var(--font-source-sans)' },
 };
 
 export interface DesignSystemState {
@@ -81,11 +35,13 @@ export interface DesignSystemState {
         '2xl': string;
         '3xl': string;
     };
-    typographyPreset: TypographyPreset;
+    displayFont: FontOption;
+    bodyFont: FontOption;
     setColors: (colors: Partial<DesignSystemState['colors']>) => void;
     setFonts: (fonts: Partial<DesignSystemState['fonts']>) => void;
     setBorderRadius: (radius: Partial<DesignSystemState['borderRadius']>) => void;
-    setTypographyPreset: (preset: TypographyPreset) => void;
+    setDisplayFont: (font: FontOption) => void;
+    setBodyFont: (font: FontOption) => void;
     reset: () => void;
 }
 
@@ -110,7 +66,8 @@ const defaultState = {
         '2xl': '1.5rem',
         '3xl': '2rem',
     },
-    typographyPreset: 'cabinet-literata' as TypographyPreset,
+    displayFont: 'cabinet' as FontOption,
+    bodyFont: 'atkinson' as FontOption,
 };
 
 export const useDesignSystemStore = create<DesignSystemState>()(
@@ -129,9 +86,13 @@ export const useDesignSystemStore = create<DesignSystemState>()(
                 set((state) => ({
                     borderRadius: { ...state.borderRadius, ...radius },
                 })),
-            setTypographyPreset: (preset) =>
+            setDisplayFont: (font) =>
                 set(() => ({
-                    typographyPreset: preset,
+                    displayFont: font,
+                })),
+            setBodyFont: (font) =>
+                set(() => ({
+                    bodyFont: font,
                 })),
             reset: () => set(defaultState),
         }),
